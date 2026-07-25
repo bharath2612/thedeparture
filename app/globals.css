@@ -521,12 +521,13 @@ h1 {
   text-overflow: ellipsis;
   pointer-events: none;
 }
+/* Position is computed in JS and applied inline (see useAnchored): these
+   panels are portalled to <body> because the search card clips its children
+   and its backdrop-filter traps fixed positioning. Do not add top/left/width
+   here — inline styles own placement, CSS owns appearance. */
 .picker-list,
 .cal-pop {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  z-index: 60;
+  z-index: 200;
   background: rgba(18, 24, 32, 0.97);
   border: 1px solid var(--rule-2);
   border-radius: var(--r-sm);
@@ -535,10 +536,8 @@ h1 {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 .picker-list {
-  min-width: 320px;
-  max-width: 420px;
-  max-height: 336px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   list-style: none;
   margin: 0;
   padding: 6px;
@@ -598,7 +597,7 @@ h1 {
 }
 .cal-pop {
   padding: 14px;
-  width: max-content;
+  overflow-y: auto;
 }
 .cal-nav {
   display: flex;
@@ -631,9 +630,11 @@ h1 {
 .cal-months {
   display: flex;
   gap: 22px;
+  justify-content: center;
 }
 .cal-month {
   width: 224px;
+  flex: 0 0 auto;
 }
 .cal-title {
   font-size: 14px;

@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useAnchored } from "./useAnchored";
 
 // Typeahead over the worldwide airport/city index. Keyboard-first: ↑/↓ to move,
 // Enter to take the highlighted row, Esc to close. Requests are debounced and
 // stale responses are discarded, so fast typing can't leave an older result set
 // on screen.
+//
+// The result list renders in a portal on <body>: the search card clips its
+// children and its backdrop-filter traps fixed positioning, so an in-place
+// dropdown gets cut off. See useAnchored.
 
 export interface Place {
   id: string;
@@ -33,16 +39,25 @@ export default function PlacePicker({
 }) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [results, setResults] = useState<Place[]>([]);
   const [active, setActive] = useState(0);
-  const boxRef = useRef<HTMLDivElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLUListElement>(null);
   const reqId = useRef(0);
 
-  // Close when focus leaves the whole control, not just the input — clicking a
-  // result must not count as leaving.
+  const anchored = useAnchored(open, fieldRef, 380);
+
+  useEffect(() => setMounted(true), []);
+
+  // Close when the click lands outside BOTH the field and the portalled list —
+  // the list is not a DOM descendant of the field, so one check isn't enough.
   useEffect(() => {
     function onDocDown(e: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (fieldRef.current?.contains(t)) return;
+      if (popRef.current?.contains(t)) return;
+      setOpen(false);
     }
     document.addEventListener("mousedown", onDocDown);
     return () => document.removeEventListener("mousedown", onDocDown);
@@ -93,10 +108,45 @@ export default function PlacePicker({
     }
   }
 
-  const shown = value && !open ? (kind === "airport" ? `${value.city || value.primary} · ${value.code}` : value.primary) : text;
+  const shown =
+    value && !open
+      ? kind === "airport"
+        ? `${value.city || value.primary} · ${value.code}`
+        : value.primary
+      : text;
+
+  const list =
+    open && anchored.ready && results.length > 0 ? (
+      <ul
+        className="picker-list"
+        id={`${inputId}-list`}
+        role="listbox"
+        ref={popRef}
+        style={anchored.style}
+      >
+        {results.map((r, i) => (
+          <li
+            key={r.id}
+            role="option"
+            aria-selected={i === active}
+            className={i === active ? "on" : ""}
+            onMouseEnter={() => setActive(i)}
+            onMouseDown={(e) => {
+              // mousedown, not click: the input's blur would close the list first.
+              e.preventDefault();
+              pick(r);
+            }}
+          >
+            <span className="p">{r.primary}</span>
+            <span className="s">{r.secondary}</span>
+            <span className="c">{r.code}</span>
+          </li>
+        ))}
+      </ul>
+    ) : null;
 
   return (
-    <div className="field picker" ref={boxRef}>
+    <div className="field picker" ref={fieldRef}>
       <label htmlFor={inputId}>{label}</label>
       <input
         id={inputId}
@@ -117,28 +167,7 @@ export default function PlacePicker({
         onKeyDown={onKeyDown}
       />
       {value && !open && <span className="picker-sub">{value.secondary}</span>}
-      {open && results.length > 0 && (
-        <ul className="picker-list" id={`${inputId}-list`} role="listbox">
-          {results.map((r, i) => (
-            <li
-              key={r.id}
-              role="option"
-              aria-selected={i === active}
-              className={i === active ? "on" : ""}
-              onMouseEnter={() => setActive(i)}
-              onMouseDown={(e) => {
-                // mousedown, not click: the input's blur would close the list first.
-                e.preventDefault();
-                pick(r);
-              }}
-            >
-              <span className="p">{r.primary}</span>
-              <span className="s">{r.secondary}</span>
-              <span className="c">{r.code}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      {mounted && list ? createPortal(list, document.body) : null}
     </div>
   );
 }

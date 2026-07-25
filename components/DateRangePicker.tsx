@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useAnchored } from "./useAnchored";
+
+// Two months side by side need ~522px; one needs ~252px. Below that the panel
+// is clamped to the viewport and we drop to a single month rather than letting
+// it overflow the screen.
+const TWO_MONTH_WIDTH = 522;
+const ONE_MONTH_WIDTH = 252;
 
 // Two-month calendar with range selection. No dependency — a date picker is
 // ~150 lines and pulling in a library would cost more bytes than the whole
@@ -62,20 +70,30 @@ export default function DateRangePicker({
   id: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [pickingEnd, setPickingEnd] = useState(false);
   const [hover, setHover] = useState("");
   const boxRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   const min = minDate || todayStr();
   const [vy, setVy] = useState(() => Number(start.slice(0, 4)) || new Date().getFullYear());
   const [vm, setVm] = useState(() => (Number(start.slice(5, 7)) || new Date().getMonth() + 1) - 1);
 
+  const anchored = useAnchored(open, boxRef, TWO_MONTH_WIDTH);
+  // If the viewport forced the panel narrower than two months fit, show one.
+  const months = anchored.width >= TWO_MONTH_WIDTH - 1 ? 2 : 1;
+
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     function onDocDown(e: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setPickingEnd(false);
-      }
+      const t = e.target as Node;
+      if (boxRef.current?.contains(t)) return;
+      // The panel is portalled to <body>, so it is not inside boxRef.
+      if (popRef.current?.contains(t)) return;
+      setOpen(false);
+      setPickingEnd(false);
     }
     document.addEventListener("mousedown", onDocDown);
     return () => document.removeEventListener("mousedown", onDocDown);
@@ -159,6 +177,43 @@ export default function DateRangePicker({
 
   const [ny, nm] = addMonth(vy, vm, 1);
 
+  const panel =
+    open && anchored.ready ? (
+      <div className="cal-pop" ref={popRef} style={anchored.style}>
+        <div className="cal-nav">
+          <button
+            type="button"
+            onClick={() => {
+              const [y, m] = addMonth(vy, vm, -1);
+              setVy(y);
+              setVm(m);
+            }}
+            aria-label="Previous month"
+          >
+            ←
+          </button>
+          <span>
+            {rangeMode ? (pickingEnd ? "Pick the return date" : "Pick the departure date") : "Pick a date"}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const [y, m] = addMonth(vy, vm, 1);
+              setVy(y);
+              setVm(m);
+            }}
+            aria-label="Next month"
+          >
+            →
+          </button>
+        </div>
+        <div className="cal-months" onMouseLeave={() => setHover("")}>
+          {renderMonth(vy, vm)}
+          {months === 2 ? renderMonth(ny, nm) : null}
+        </div>
+      </div>
+    ) : null;
+
   return (
     <div className="field picker" ref={boxRef}>
       <label htmlFor={id}>{label}</label>
@@ -174,46 +229,7 @@ export default function DateRangePicker({
       >
         {summary}
       </button>
-
-      {open && (
-        <div className="cal-pop">
-          <div className="cal-nav">
-            <button
-              type="button"
-              onClick={() => {
-                const [y, m] = addMonth(vy, vm, -1);
-                setVy(y);
-                setVm(m);
-              }}
-              aria-label="Previous month"
-            >
-              ←
-            </button>
-            <span>
-              {rangeMode
-                ? pickingEnd
-                  ? "Pick the return date"
-                  : "Pick the departure date"
-                : "Pick a date"}
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                const [y, m] = addMonth(vy, vm, 1);
-                setVy(y);
-                setVm(m);
-              }}
-              aria-label="Next month"
-            >
-              →
-            </button>
-          </div>
-          <div className="cal-months" onMouseLeave={() => setHover("")}>
-            {renderMonth(vy, vm)}
-            {renderMonth(ny, nm)}
-          </div>
-        </div>
-      )}
+      {mounted && panel ? createPortal(panel, document.body) : null}
     </div>
   );
 }
