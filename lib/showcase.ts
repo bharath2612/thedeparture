@@ -40,7 +40,7 @@ export interface ShowcaseHotels {
 }
 
 const cachedFlights = unstable_cache(
-  async (from: string, to: string, date: string): Promise<ShowcaseFlights> => {
+  async (from: string, to: string, date: string, currency: string): Promise<ShowcaseFlights> => {
     try {
       const res = await shopFlights({
         origin: from,
@@ -48,6 +48,7 @@ const cachedFlights = unstable_cache(
         departDate: date,
         adults: 1,
         cabin: "economy",
+        currency,
       });
       return {
         route: { from, to, date },
@@ -71,7 +72,13 @@ const cachedFlights = unstable_cache(
 );
 
 const cachedHotels = unstable_cache(
-  async (city: string, country: string, checkin: string, checkout: string): Promise<ShowcaseHotels> => {
+  async (
+    city: string,
+    country: string,
+    checkin: string,
+    checkout: string,
+    currency: string
+  ): Promise<ShowcaseHotels> => {
     try {
       const res = await shop({
         city,
@@ -79,7 +86,7 @@ const cachedHotels = unstable_cache(
         checkin,
         checkout,
         occupancies: [{ adults: 2 }],
-        currency: process.env.DEFAULT_CURRENCY || "AED",
+        currency,
         guestNationality: country,
       });
       return {
@@ -97,7 +104,7 @@ const cachedHotels = unstable_cache(
 );
 
 const cachedDestination = unstable_cache(
-  async (from: string, to: string, date: string) => {
+  async (from: string, to: string, date: string, currency: string) => {
     try {
       const res = await shopFlights({
         origin: from,
@@ -105,6 +112,7 @@ const cachedDestination = unstable_cache(
         departDate: date,
         adults: 1,
         cabin: "economy",
+        currency,
       });
       const best = res.flights[0];
       return best ? { sell: best.best.priced.sell, currency: best.best.priced.currency } : null;
@@ -116,12 +124,14 @@ const cachedDestination = unstable_cache(
   { revalidate: DEST_TTL, tags: ["showcase"] }
 );
 
-export function showcaseFlights() {
-  return cachedFlights("DEL", "DXB", isoDaysOut(21));
+// Currency is part of the cache key, so switching it can't serve a cached page
+// still priced in the previous one.
+export function showcaseFlights(currency: string) {
+  return cachedFlights("DEL", "DXB", isoDaysOut(21), currency);
 }
 
-export function showcaseHotels() {
-  return cachedHotels("Mumbai", "IN", isoDaysOut(30), isoDaysOut(33));
+export function showcaseHotels(currency: string) {
+  return cachedHotels("Mumbai", "IN", isoDaysOut(30), isoDaysOut(33), currency);
 }
 
 export interface DestinationCard {
@@ -138,8 +148,10 @@ const DESTINATIONS = [
   { city: "London", code: "LHR", dur: "6.8s" },
 ];
 
-export async function destinationCards(origin = "DEL"): Promise<DestinationCard[]> {
+export async function destinationCards(currency: string, origin = "DEL"): Promise<DestinationCard[]> {
   const date = isoDaysOut(28);
-  const prices = await Promise.all(DESTINATIONS.map((d) => cachedDestination(origin, d.code, date)));
+  const prices = await Promise.all(
+    DESTINATIONS.map((d) => cachedDestination(origin, d.code, date, currency))
+  );
   return DESTINATIONS.map((d, i) => ({ ...d, from: origin, price: prices[i] }));
 }

@@ -3,6 +3,7 @@ import { shopFlights, requireCheckedBags } from "@/lib/flightshop";
 import { formatDuration, type CabinClass } from "@/lib/flights/types";
 import { money } from "@/lib/markup";
 import { SiteFooter } from "@/components/Bits";
+import { resolveCurrency } from "@/lib/currency.server";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,11 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
   const cabin = (CABINS.includes(sp.cabin as CabinClass) ? sp.cabin : "economy") as CabinClass;
   const minBags = Math.max(0, Number(sp.bags) || 0);
 
+  // Advisory only on air: Duffel prices in the airline's/account's currency and
+  // has no currency parameter, so an offer is always shown in the currency it
+  // was actually quoted in. We never convert.
+  const currency = (await resolveCurrency()).code;
+
   const res = await shopFlights({
     origin: from,
     destination: to,
@@ -44,7 +50,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
     returnDate: ret,
     adults,
     cabin,
-    currency: process.env.DEFAULT_CURRENCY || "AED",
+    currency,
   });
 
   const all = res.flights;

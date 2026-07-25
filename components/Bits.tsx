@@ -1,4 +1,7 @@
 import Link from "next/link";
+import CurrencySwitcher from "./CurrencySwitcher";
+import { COMPANY } from "@/lib/company";
+import type { CurrencyCode } from "@/lib/currency";
 
 // The three components the landing design imported (StatusPill, AgentChip,
 // SlaBadge) plus the shared header/footer/chat dock. Rebuilt as real React —
@@ -52,9 +55,11 @@ export function SlaBadge({ seconds, label }: { seconds: number; label?: string }
 
 export function SiteHeader({
   env,
+  currency,
   active,
 }: {
   env: { label: string; live: boolean };
+  currency: { code: CurrencyCode; source: "chosen" | "ip" | "default" };
   active?: "how" | "agencies" | "support";
 }) {
   return (
@@ -77,6 +82,7 @@ export function SiteHeader({
           </Link>
         </nav>
         <div className="navright">
+          <CurrencySwitcher current={currency.code} source={currency.source} />
           <span className="envtag">
             ENV <b className={env.live ? "env-live" : "env-sandbox"}>{env.label}</b>
           </span>
@@ -87,6 +93,7 @@ export function SiteHeader({
 }
 
 export function SiteFooter() {
+  const a = COMPANY.address;
   return (
     <footer className="sitefoot">
       <div className="inner">
@@ -94,7 +101,7 @@ export function SiteFooter() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="" style={{ width: 34, height: 34, borderRadius: 8 }} />
           <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontSize: 17, fontWeight: 500 }}>The Departure</span>
+            <span style={{ fontSize: 17, fontWeight: 500 }}>{COMPANY.brand}</span>
             <span className="mark">Smart Travel · AI Powered</span>
           </span>
         </div>
@@ -102,9 +109,15 @@ export function SiteFooter() {
           <Link href="/flights">Flights</Link>
           <Link href="/results">Hotels</Link>
           <Link href="/suppliers">Suppliers</Link>
-          <a href="/plan.html">Strategy</a>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
         </div>
-        <span className="copy">© 2026 THE DEPARTURE</span>
+      </div>
+      <div className="legalbar">
+        <span>
+          {COMPANY.legalName} · {a.line1}, {a.line2}, {a.city} {a.postcode}, {a.country}
+        </span>
+        <span className="copy">© 2026 {COMPANY.legalName.toUpperCase()}</span>
       </div>
     </footer>
   );

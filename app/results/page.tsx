@@ -2,6 +2,8 @@ import Link from "next/link";
 import { shop } from "@/lib/rateshop";
 import { money } from "@/lib/markup";
 import { LiteApiError } from "@/lib/liteapi";
+import { resolveCurrency } from "@/lib/currency.server";
+import { SiteFooter } from "@/components/Bits";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,9 @@ export default async function Results({ searchParams }: { searchParams: Promise<
   const checkout = sp.checkout || new Date(Date.now() + 33 * 864e5).toISOString().slice(0, 10);
   const adults = Math.max(1, Number(sp.adults) || 2);
   const nights = nightsBetween(checkin, checkout);
-  const currency = process.env.DEFAULT_CURRENCY || "AED";
+  // LiteAPI prices natively in the requested currency, so this is a real quote
+  // in the traveller's currency — not one of ours converted after the fact.
+  const currency = (await resolveCurrency()).code;
 
   let result: Awaited<ReturnType<typeof shop>> | null = null;
   let error: string | null = null;

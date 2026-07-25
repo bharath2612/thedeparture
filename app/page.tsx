@@ -7,6 +7,7 @@ import { money, defaultMarkupPct } from "@/lib/markup";
 import { activeFlightSuppliers, FLIGHT_SUPPLIERS } from "@/lib/flights/registry";
 import { activeSuppliers } from "@/lib/suppliers/registry";
 import { formatDuration } from "@/lib/flights/types";
+import { resolveCurrency } from "@/lib/currency.server";
 
 // Air times arrive as local ISO strings ("2026-08-19T18:40:00"). Slicing beats
 // Date parsing here: constructing a Date would re-project them into the
@@ -55,7 +56,8 @@ const PILLARS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const currency = (await resolveCurrency()).code;
   const air = FLIGHT_SUPPLIERS.map((s) => s.status());
   const liveAir = air.filter((s) => s.live);
   const liveHotel = activeSuppliers().map((s) => s.status());
@@ -103,7 +105,7 @@ export default function Home() {
           />
 
           <Suspense fallback={<DestSkeleton />}>
-            <DestinationCards />
+            <DestinationCards currency={currency} />
           </Suspense>
         </div>
       </section>
@@ -133,10 +135,10 @@ export default function Home() {
       <section className="section band">
         <div className="inner">
           <Suspense fallback={<ShowcaseSkeleton label="Shopping live fares…" />}>
-            <FlightShowcase />
+            <FlightShowcase currency={currency} />
           </Suspense>
           <Suspense fallback={<ShowcaseSkeleton label="Shopping live rates…" />}>
-            <HotelShowcase />
+            <HotelShowcase currency={currency} />
           </Suspense>
         </div>
       </section>
@@ -233,8 +235,8 @@ export default function Home() {
 
 // ── live sections ─────────────────────────────────────────────────────────
 
-async function DestinationCards() {
-  const cards = await destinationCards("DEL");
+async function DestinationCards({ currency }: { currency: string }) {
+  const cards = await destinationCards(currency, "DEL");
   return (
     <div className="destgrid">
       {cards.map((d) => (
@@ -275,8 +277,8 @@ function ShowcaseSkeleton({ label }: { label: string }) {
   );
 }
 
-async function FlightShowcase() {
-  const data = await showcaseFlights();
+async function FlightShowcase({ currency }: { currency: string }) {
+  const data = await showcaseFlights(currency);
   const pct = defaultMarkupPct();
   const dateLabel = new Date(data.route.date).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -375,8 +377,8 @@ async function FlightShowcase() {
   );
 }
 
-async function HotelShowcase() {
-  const data = await showcaseHotels();
+async function HotelShowcase({ currency }: { currency: string }) {
+  const data = await showcaseHotels(currency);
   return (
     <>
       <div style={{ marginBottom: 26, display: "flex", flexDirection: "column", gap: 10 }}>
