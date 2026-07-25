@@ -416,10 +416,10 @@ h1 {
   align-items: end;
 }
 .searchgrid.flights {
-  grid-template-columns: 1.2fr 1.2fr 1.1fr 1.1fr 1fr auto;
+  grid-template-columns: 1.15fr 1.15fr 1.3fr 1fr auto;
 }
 .searchgrid.hotels {
-  grid-template-columns: 1.6fr 1fr 1fr 1fr auto;
+  grid-template-columns: 1.5fr 1.4fr 1fr auto;
 }
 .field {
   display: flex;
@@ -505,6 +505,186 @@ h1 {
   color: var(--ink);
   font-weight: 500;
 }
+/* ---------------- typeahead + calendar ---------------- */
+.picker {
+  position: relative;
+}
+.picker-sub {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -17px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.picker-list,
+.cal-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  background: rgba(18, 24, 32, 0.97);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-sm);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+.picker-list {
+  min-width: 320px;
+  max-width: 420px;
+  max-height: 336px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+}
+.picker-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "p c" "s c";
+  gap: 0 12px;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+.picker-list li.on {
+  background: rgba(255, 255, 255, 0.09);
+}
+.picker-list .p {
+  grid-area: p;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.picker-list .s {
+  grid-area: s;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.picker-list .c {
+  grid-area: c;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+
+.cal-trigger {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cal-pop {
+  padding: 14px;
+  width: max-content;
+}
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.cal-nav button {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  font-family: var(--sans);
+}
+.cal-nav button:hover {
+  border-color: var(--rule-2);
+  background: rgba(255, 255, 255, 0.12);
+}
+.cal-months {
+  display: flex;
+  gap: 22px;
+}
+.cal-month {
+  width: 224px;
+}
+.cal-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-dow span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: center;
+  padding-bottom: 4px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.cal-day:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+.cal-day:disabled {
+  color: var(--ink-3);
+  opacity: 0.35;
+  cursor: default;
+}
+.cal-day.in {
+  background: rgba(110, 168, 255, 0.16);
+  border-radius: 0;
+}
+.cal-day.sel {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+}
+
 .chips {
   margin-top: 12px;
   display: flex;

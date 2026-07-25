@@ -2,13 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import PlacePicker, { type Place } from "./PlacePicker";
+import DateRangePicker from "./DateRangePicker";
 
 // The glass search bar from the landing design, wired to the real rails.
 // Flights → /flights (Duffel + any other live air supplier)
-// Hotels  → /results (the existing multi-supplier hotel rate-shop)
+// Hotels  → /results (the multi-supplier hotel rate-shop)
 //
-// Dates are passed in from the server so SSR and the client agree — computing
-// "today + 30" on both sides would mismatch across a midnight boundary.
+// Both destination fields search the full worldwide index (5,328 airports,
+// 236 countries) rather than a curated shortlist. Dates come from a real
+// two-month range calendar, not a native date input.
 
 export interface SearchDefaults {
   depart: string;
@@ -17,45 +20,30 @@ export interface SearchDefaults {
   checkout: string;
 }
 
-// LiteAPI needs a country code alongside the city, so destination is a fixed
-// list rather than free text. These are the corridor cities that actually have
-// inventory; a free-text box that silently returns nothing is worse UX.
-const HOTEL_CITIES = [
-  { label: "Dubai, UAE", city: "Dubai", country: "AE" },
-  { label: "Abu Dhabi, UAE", city: "Abu Dhabi", country: "AE" },
-  { label: "Sharjah, UAE", city: "Sharjah", country: "AE" },
-  { label: "Mumbai, India", city: "Mumbai", country: "IN" },
-  { label: "Kochi, India", city: "Kochi", country: "IN" },
-  { label: "Bengaluru, India", city: "Bengaluru", country: "IN" },
-  { label: "New Delhi, India", city: "New Delhi", country: "IN" },
-  { label: "Chennai, India", city: "Chennai", country: "IN" },
-  { label: "Doha, Qatar", city: "Doha", country: "QA" },
-  { label: "Muscat, Oman", city: "Muscat", country: "OM" },
-  { label: "Riyadh, Saudi Arabia", city: "Riyadh", country: "SA" },
-  { label: "Singapore", city: "Singapore", country: "SG" },
-  { label: "Bangkok, Thailand", city: "Bangkok", country: "TH" },
-  { label: "London, UK", city: "London", country: "GB" },
-];
-
-const AIRPORTS = [
-  { code: "DEL", label: "Delhi · DEL" },
-  { code: "BOM", label: "Mumbai · BOM" },
-  { code: "COK", label: "Kochi · COK" },
-  { code: "MAA", label: "Chennai · MAA" },
-  { code: "BLR", label: "Bengaluru · BLR" },
-  { code: "HYD", label: "Hyderabad · HYD" },
-  { code: "CCJ", label: "Kozhikode · CCJ" },
-  { code: "TRV", label: "Thiruvananthapuram · TRV" },
-  { code: "DXB", label: "Dubai · DXB" },
-  { code: "SHJ", label: "Sharjah · SHJ" },
-  { code: "AUH", label: "Abu Dhabi · AUH" },
-  { code: "DOH", label: "Doha · DOH" },
-  { code: "MCT", label: "Muscat · MCT" },
-  { code: "RUH", label: "Riyadh · RUH" },
-  { code: "JED", label: "Jeddah · JED" },
-  { code: "SIN", label: "Singapore · SIN" },
-  { code: "LHR", label: "London · LHR" },
-];
+const DEFAULT_FROM: Place = {
+  id: "DEL",
+  primary: "New Delhi",
+  secondary: "Indira Gandhi International Airport · India",
+  code: "DEL",
+  city: "New Delhi",
+  country: "IN",
+};
+const DEFAULT_TO: Place = {
+  id: "DXB",
+  primary: "Dubai",
+  secondary: "Dubai International Airport · United Arab Emirates",
+  code: "DXB",
+  city: "Dubai",
+  country: "AE",
+};
+const DEFAULT_CITY: Place = {
+  id: "Dubai|AE",
+  primary: "Dubai",
+  secondary: "United Arab Emirates",
+  code: "AE",
+  city: "Dubai",
+  country: "AE",
+};
 
 export default function SearchPanel({
   defaults,
@@ -73,8 +61,8 @@ export default function SearchPanel({
   const [loading, setLoading] = useState(false);
 
   // flights
-  const [from, setFrom] = useState("DEL");
-  const [to, setTo] = useState("DXB");
+  const [from, setFrom] = useState<Place>(DEFAULT_FROM);
+  const [to, setTo] = useState<Place>(DEFAULT_TO);
   const [trip, setTrip] = useState<"return" | "oneway">("return");
   const [depart, setDepart] = useState(defaults.depart);
   const [ret, setRet] = useState(defaults.return);
@@ -82,32 +70,41 @@ export default function SearchPanel({
   const [cabin, setCabin] = useState("economy");
 
   // hotels
-  const [dest, setDest] = useState(HOTEL_CITIES[0].label);
+  const [dest, setDest] = useState<Place>(DEFAULT_CITY);
   const [checkin, setCheckin] = useState(defaults.checkin);
   const [checkout, setCheckout] = useState(defaults.checkout);
   const [guests, setGuests] = useState(2);
 
+  const [error, setError] = useState("");
+
   function searchFlights(e: React.FormEvent) {
     e.preventDefault();
+    if (from.code === to.code) {
+      setError("Origin and destination are the same airport.");
+      return;
+    }
+    if (trip === "return" && !ret) {
+      setError("Pick a return date, or switch to one way.");
+      return;
+    }
+    setError("");
     setLoading(true);
-    const q = new URLSearchParams({
-      from,
-      to,
-      depart,
-      adults: String(pax),
-      cabin,
-    });
+    const q = new URLSearchParams({ from: from.code, to: to.code, depart, adults: String(pax), cabin });
     if (trip === "return") q.set("return", ret);
     router.push(`/flights?${q}`);
   }
 
   function searchHotels(e: React.FormEvent) {
     e.preventDefault();
+    if (!checkout || checkout <= checkin) {
+      setError("Check-out must be after check-in.");
+      return;
+    }
+    setError("");
     setLoading(true);
-    const picked = HOTEL_CITIES.find((c) => c.label === dest) || HOTEL_CITIES[0];
     const q = new URLSearchParams({
-      city: picked.city,
-      country: picked.country,
+      city: dest.city,
+      country: dest.country,
       checkin,
       checkout,
       adults: String(guests),
@@ -123,10 +120,9 @@ export default function SearchPanel({
             type="button"
             className={`tab ${tab === "flights" ? "on" : ""}`}
             onClick={() => setTab("flights")}
-            disabled={!flightsLive}
             title={flightsLive ? undefined : flightsNote}
           >
-            Flights{flightsLive ? "" : " · soon"}
+            Flights
           </button>
           <button
             type="button"
@@ -156,45 +152,33 @@ export default function SearchPanel({
               </button>
             </div>
             <div className="searchgrid flights">
-              <div className="field">
-                <label htmlFor="from">From</label>
-                <select id="from" value={from} onChange={(e) => setFrom(e.target.value)}>
-                  {AIRPORTS.map((a) => (
-                    <option key={a.code} value={a.code}>
-                      {a.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="to">To</label>
-                <select id="to" value={to} onChange={(e) => setTo(e.target.value)}>
-                  {AIRPORTS.map((a) => (
-                    <option key={a.code} value={a.code}>
-                      {a.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="depart">Depart</label>
-                <input
-                  id="depart"
-                  type="date"
-                  value={depart}
-                  onChange={(e) => setDepart(e.target.value)}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="ret">{trip === "return" ? "Return" : "Return · off"}</label>
-                <input
-                  id="ret"
-                  type="date"
-                  value={ret}
-                  disabled={trip !== "return"}
-                  onChange={(e) => setRet(e.target.value)}
-                />
-              </div>
+              <PlacePicker
+                inputId="from"
+                label="From"
+                kind="airport"
+                value={from}
+                onChange={setFrom}
+                placeholder="City or airport"
+              />
+              <PlacePicker
+                inputId="to"
+                label="To"
+                kind="airport"
+                value={to}
+                onChange={setTo}
+                placeholder="City or airport"
+              />
+              <DateRangePicker
+                id="flightdates"
+                label={trip === "return" ? "Depart · Return" : "Depart"}
+                start={depart}
+                end={ret}
+                rangeMode={trip === "return"}
+                onChange={(s, e2) => {
+                  setDepart(s);
+                  setRet(e2);
+                }}
+              />
               <div className="field">
                 <label htmlFor="pax">Travellers</label>
                 <select
@@ -206,10 +190,10 @@ export default function SearchPanel({
                     setCabin(c);
                   }}
                 >
-                  {[1, 2, 3, 4].flatMap((n) =>
-                    ["economy", "business"].map((c) => (
+                  {[1, 2, 3, 4, 5, 6].flatMap((n) =>
+                    ["economy", "premium_economy", "business", "first"].map((c) => (
                       <option key={`${n}|${c}`} value={`${n}|${c}`}>
-                        {n} · {c === "economy" ? "Economy" : "Business"}
+                        {n} · {c === "premium_economy" ? "Premium" : c[0].toUpperCase() + c.slice(1)}
                       </option>
                     ))
                   )}
@@ -223,41 +207,28 @@ export default function SearchPanel({
         ) : (
           <form onSubmit={searchHotels}>
             <div className="searchgrid hotels">
-              <div className="field">
-                <label htmlFor="dest">Destination</label>
-                <select id="dest" value={dest} onChange={(e) => setDest(e.target.value)}>
-                  {HOTEL_CITIES.map((c) => (
-                    <option key={c.label} value={c.label}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="checkin">Check-in</label>
-                <input
-                  id="checkin"
-                  type="date"
-                  value={checkin}
-                  onChange={(e) => setCheckin(e.target.value)}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="checkout">Check-out</label>
-                <input
-                  id="checkout"
-                  type="date"
-                  value={checkout}
-                  onChange={(e) => setCheckout(e.target.value)}
-                />
-              </div>
+              <PlacePicker
+                inputId="dest"
+                label="Destination"
+                kind="city"
+                value={dest}
+                onChange={setDest}
+                placeholder="Any city worldwide"
+              />
+              <DateRangePicker
+                id="staydates"
+                label="Check-in · Check-out"
+                start={checkin}
+                end={checkout}
+                rangeMode
+                onChange={(s, e2) => {
+                  setCheckin(s);
+                  setCheckout(e2);
+                }}
+              />
               <div className="field">
                 <label htmlFor="guests">Guests</label>
-                <select
-                  id="guests"
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                >
+                <select id="guests" value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
                   {[1, 2, 3, 4, 5, 6].map((n) => (
                     <option key={n} value={n}>
                       {n} · 1 room
@@ -270,6 +241,12 @@ export default function SearchPanel({
               </button>
             </div>
           </form>
+        )}
+
+        {error && (
+          <div className="searchfoot" style={{ color: "var(--alert)", paddingTop: 0 }}>
+            {error}
+          </div>
         )}
 
         <div className="searchfoot">
