@@ -10,13 +10,19 @@ import {
   type NormalizedFlightOffer,
 } from "./types";
 
-// Amadeus Self-Service — a SHOP-ONLY supplier.
+// Amadeus Self-Service — SHOP-ONLY, and as of 17 July 2026, CLOSED.
 //
-// It is the best free flight CONTENT available without accreditation, and it is
-// genuinely useful here: a second quote on the same EK 512 is what makes
-// "cheapest of N" real on air. But issuance is the catch — Self-Service cannot
-// plate a ticket, so `bookable` is false and the UI must never offer Book on an
-// Amadeus-won offer. It prices; Duffel fulfils.
+// Amadeus decommissioned the self-service developer portal on 2026-07-17:
+// new registration is shut and existing keys are disabled. Only the Enterprise
+// portal survives, and that needs a contract and an account manager — not a
+// self-serve key. So this adapter is kept for one reason: anyone holding a
+// still-valid legacy key can keep shopping with it, and the code is already in
+// place if we ever land an Enterprise contract.
+//
+// Do not plan on getting a new key here. Duffel is the self-serve path now.
+//
+// It was never able to issue a ticket in any case — Self-Service has no
+// ticketing authority — so `bookable` is false and it implements no book().
 //
 // Auth is OAuth2 client-credentials; the token lives ~30 min so we cache it.
 
@@ -47,8 +53,8 @@ function status(): FlightSupplierStatus {
     live: connected,
     bookable: false, // structural: Self-Service has no ticketing authority
     note: connected
-      ? `Live (${creds().host.startsWith("test") ? "test" : "production"}) — SHOP ONLY, cannot issue tickets`
-      : "Not connected — free self-serve key at developers.amadeus.com. Shop-only: prices, never issues.",
+      ? `Legacy key in use (${creds().host.startsWith("test") ? "test" : "production"}) — SHOP ONLY, cannot issue tickets. Portal closed 17 Jul 2026; this key will stop working.`
+      : "CLOSED — Amadeus decommissioned the self-service portal on 17 Jul 2026. No new keys. Use Duffel, or an Amadeus Enterprise contract.",
   };
 }
 
