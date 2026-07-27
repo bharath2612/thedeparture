@@ -176,7 +176,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
                         {f.checkedBags > 0 ? `${f.checkedBags} checked bag` : "no checked bag"}
                       </span>
                       {f.supplierCount > 1 && (
-                        <span className="supbadge">cheapest of {f.supplierCount}</span>
+                        <span className="supbadge">lowest of {f.supplierCount}</span>
                       )}
                       {!canBook && <span className="supbadge demo">shop only</span>}
                     </span>
@@ -221,7 +221,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
                   )}
                 </div>
 
-                <div>{i === 0 ? <span className="flag">CHEAPEST NET</span> : null}</div>
+                <div>{i === 0 ? <span className="flag">LOWEST PRICE</span> : null}</div>
 
                 <div className="stack-r">
                   <span className="amt">{money(p.sell, p.currency)}</span>
@@ -262,7 +262,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
         )}
 
         <div className="footer">
-          Flight identity is exact (carrier, flight number and date), so &ldquo;cheapest of N&rdquo; on
+          Flight identity is exact (carrier, flight number and date), so &ldquo;lowest of N&rdquo; on
           air is a true comparison, not a fuzzy match. Ranking is on price; the checked-bag filter is a
           filter, never an invented bag fee.
         </div>

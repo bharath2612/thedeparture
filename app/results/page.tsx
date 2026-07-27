@@ -142,7 +142,7 @@ export default async function Results({ searchParams }: { searchParams: Promise<
                     ✓ best: {h.best.supplierName}
                   </span>
                   {h.supplierCount > 1 && (
-                    <span className="supbadge">cheapest of {h.supplierCount} suppliers</span>
+                    <span className="supbadge">lowest of {h.supplierCount} suppliers</span>
                   )}
                   <span className="supbadge">{h.best.board}</span>
                 </div>
@@ -187,14 +187,14 @@ export default async function Results({ searchParams }: { searchParams: Promise<
       <div className="footer">
         {ops ? (
           <>
-            We query every connected aggregator, pick the cheapest net per hotel, and add your{" "}
+            We query every connected aggregator, pick the lowest net per hotel, and add your{" "}
             {markupPct}% margin. Add more suppliers → cheaper wins.{" "}
             <Link href="/suppliers">suppliers →</Link>
           </>
         ) : (
           <>
-            We query every supplier we&apos;re connected to and show you the cheapest room we can find,
-            the same room priced against itself.
+            We query every supplier we&apos;re connected to and get you the lowest price we can find on
+            the same room, priced against itself.
           </>
         )}
       </div>

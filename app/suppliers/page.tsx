@@ -33,7 +33,7 @@ export default function Suppliers() {
           </h1>
           <p className="standfirst" style={{ marginTop: 18, maxWidth: "62ch" }}>
             The platform queries all live suppliers in parallel and sells the lowest net. Onboarding one
-            is: get its key, implement its adapter, flip it live. No single supplier is cheapest on
+            is: get its key, implement its adapter, flip it live. No single supplier is lowest on
             everything, which is the whole point.
           </p>
         </section>
@@ -113,7 +113,7 @@ export default function Suppliers() {
         <div className="callout" style={{ marginTop: 30 }}>
           To onboard a supplier: add its key to <b>.env.local</b> (e.g. <b>DUFFEL_TOKEN=…</b> or{" "}
           <b>REZLIVE_KEY=…</b>), implement its adapter, and register it. Air and hotel rails share the
-          same shape: fan out, group by identity, sell the cheapest net. The one rule the code
+          same shape: fan out, group by identity, sell the lowest net. The one rule the code
           enforces: a supplier without ticketing authority can price a flight but can never be handed a
           booking.
         </div>

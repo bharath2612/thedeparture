@@ -25,13 +25,13 @@ const STEPS = [
   {
     num: "1",
     title: "We find the best price",
-    body: "We fan out to every connected supplier at once and show you the lowest net we can find, so you always save real money.",
+    body: "We fan out to every connected supplier at once and get you the lowest price we can find, so you always save real money.",
     img: "/img/step-1.webp",
   },
   {
     num: "2",
     title: "Book in seconds",
-    body: "Book for yourself or your whole circle. Saved co-travellers, one tap. A named agent is attached from the start.",
+    body: "Book for yourself or your whole circle. Saved co-travellers, one tap. A real person is on the booking from the start.",
     img: "/img/step-2.webp",
   },
   {
@@ -43,8 +43,9 @@ const STEPS = [
 ];
 
 // The band headline is a function of the tab: someone on Hotels should not be
-// sold a flight promise. The same claim underneath both (cheapest net, real
-// agent), said in the language of what they are actually shopping for. The
+// sold a flight promise. The same claim underneath both (lowest price we can
+// find, a real person), said in the language of what they are actually
+// shopping for. The
 // badge is deliberately identical across tabs: it is the brand line, not a
 // mode line, so it must not flicker when the tab changes.
 const BADGE = "Smart travel · AI powered · We are with you on every trip";
@@ -57,7 +58,7 @@ const BAND_COPY = {
         Book smarter. <span className="grad">Land cheaper.</span>
       </>
     ),
-    sub: "One search across every supplier we're connected to, plus a named agent on the trip rather than a ticket queue.",
+    sub: "One search across every airline we're connected to, the lowest fare we can find, and a real person who stays with the trip.",
   },
   hotels: {
     badge: BADGE,
@@ -66,7 +67,7 @@ const BAND_COPY = {
         Check in for less. <span className="grad">Stay a night longer.</span>
       </>
     ),
-    sub: "We price the same room across every connected supplier and sell you the cheapest, with the same agent on the booking if anything moves.",
+    sub: "The same room priced across every supplier we're connected to, the lowest rate we can find, and a real person who stays with the booking.",
   },
 } as const;
 
@@ -84,7 +85,7 @@ const PILLARS = [
   {
     num: "03",
     title: "The floor, every time",
-    body: "We fan out to suppliers in parallel, pick the cheapest net, and prove it. Same price as any OTA. The human is the upgrade.",
+    body: "We fan out to suppliers in parallel and get you the lowest price we can find. Same price as any OTA. The human is the upgrade.",
   },
 ];
 
@@ -97,7 +98,7 @@ export default async function Home() {
   const totalLive = liveAir.length + liveHotel.length;
 
   const supplierLine = totalLive
-    ? `We query ${totalLive} connected supplier${totalLive > 1 ? "s" : ""} in parallel and sell the cheapest net, every time.`
+    ? `We query ${totalLive} connected supplier${totalLive > 1 ? "s" : ""} in parallel and get you the lowest price we can find, every time.`
     : "No suppliers connected yet. Add a key to go live.";
 
   return (
@@ -373,7 +374,7 @@ async function FlightShowcase({ currency }: { currency: string }) {
           {data.supplierCount ? (
             <>
               CHECKED <b style={{ color: "var(--ink)" }}>{data.supplierCount} SUPPLIER{data.supplierCount > 1 ? "S" : ""}</b> ·
-              CHEAPEST NET WINS · {dateLabel}
+              LOWEST PRICE WINS · {dateLabel}
             </>
           ) : (
             <>NO AIR SUPPLIER CONNECTED</>
@@ -414,7 +415,7 @@ async function FlightShowcase({ currency }: { currency: string }) {
                 </div>
                 <div>
                   {i === 0 ? (
-                    <span className="flag">CHEAPEST NET</span>
+                    <span className="flag">LOWEST PRICE</span>
                   ) : f.supplierCount > 1 ? (
                     <span className="flag quiet">{f.supplierCount} suppliers</span>
                   ) : null}
@@ -475,7 +476,7 @@ async function HotelShowcase({ currency }: { currency: string }) {
                   style={h.thumbnail ? { backgroundImage: `url("${h.thumbnail}")` } : undefined}
                 >
                   <span className="tag">
-                    {i === 0 ? "CHEAPEST NET" : h.supplierCount > 1 ? `BEST OF ${h.supplierCount}` : h.best.board}
+                    {i === 0 ? "LOWEST PRICE" : h.supplierCount > 1 ? `BEST OF ${h.supplierCount}` : h.best.board}
                   </span>
                 </div>
                 <div className="body">
