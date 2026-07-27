@@ -16,9 +16,9 @@ const SITE = "https://thedeparture.ai";
 //
 // og:description is deliberately short. WhatsApp shows about two lines before
 // truncating, so the claim has to survive being cut off.
-const SHARE_TITLE = "Flights and hotels at the lowest price";
+const SHARE_TITLE = "The Departure · Flights and hotels at the lowest price";
 const SHARE_DESC =
-  "The lowest price we can find on flights and hotels, and a real person on every trip.";
+  "Find flights and hotels at the lowest price, and never worry about the service. A real person is on every trip.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),

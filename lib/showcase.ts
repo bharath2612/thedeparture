@@ -23,6 +23,15 @@ function isoDaysOut(days: number): string {
   return new Date(Date.now() + days * 864e5).toISOString().slice(0, 10);
 }
 
+const HOTEL_ADULTS = 2;
+
+function nightsBetween(checkin: string, checkout: string): number {
+  return Math.max(
+    1,
+    Math.round((new Date(checkout).getTime() - new Date(checkin).getTime()) / 864e5)
+  );
+}
+
 export interface ShowcaseFlights {
   route: { from: string; to: string; date: string };
   flights: ShoppedFlight[];
@@ -44,35 +53,58 @@ export interface ShowcaseHotels {
   error?: string;
 }
 
+// A failure must never be cached.
+//
+// These wrappers used to catch inside the cached function and return an empty
+// list. unstable_cache stores whatever the function returns, so one transient
+// supplier hiccup was written to the cache and then served to every visitor for
+// the whole TTL: fifteen minutes for the headline rows, SIX HOURS for the
+// destination prices. That is exactly how the landing page ended up saying "No
+// live rates right now" while /results returned twelve hotels for the same city
+// and dates.
+//
+// Throwing instead means nothing is written and the next visitor retries. The
+// cost is that a genuine outage is re-queried per request rather than once per
+// TTL. That is the right way round: LiteAPI's look-to-book ratio is protected
+// by caching SUCCESS, and there is no ratio to protect when the answer is
+// empty.
+class NoResults extends Error {}
+
+// Bumping this abandons every existing entry immediately. Vercel's data cache
+// survives deployments, so without it the poisoned entries above would keep
+// being served until their own TTL expired, fix deployed or not.
+const CACHE_VERSION = "v2";
+
+function reason(e: unknown): string {
+  return e instanceof NoResults ? e.message : String((e as Error)?.message || e);
+}
+
 const cachedFlights = unstable_cache(
   async (from: string, to: string, date: string, currency: string): Promise<ShowcaseFlights> => {
-    try {
-      const res = await shopFlights({
-        origin: from,
-        destination: to,
-        departDate: date,
-        adults: 1,
-        cabin: "economy",
-        currency,
-      });
-      return {
-        route: { from, to, date },
-        flights: res.flights.slice(0, 3),
-        supplierCount: res.queried,
-        liveSuppliers: res.suppliers.filter((s) => s.live).map((s) => s.name),
-        error: res.errors.length ? res.errors.map((e) => `${e.supplier}: ${e.message}`).join(" · ") : undefined,
-      };
-    } catch (e) {
-      return {
-        route: { from, to, date },
-        flights: [],
-        supplierCount: 0,
-        liveSuppliers: [],
-        error: String((e as Error).message || e),
-      };
+    const res = await shopFlights({
+      origin: from,
+      destination: to,
+      departDate: date,
+      adults: 1,
+      cabin: "economy",
+      currency,
+    });
+    if (res.flights.length === 0) {
+      throw new NoResults(
+        res.errors.length
+          ? res.errors.map((e) => `${e.supplier}: ${e.message}`).join(" · ")
+          : "No fares returned."
+      );
     }
+    return {
+      route: { from, to, date },
+      flights: res.flights.slice(0, 3),
+      supplierCount: res.queried,
+      liveSuppliers: res.suppliers.filter((s) => s.live).map((s) => s.name),
+      error: res.errors.length ? res.errors.map((e) => `${e.supplier}: ${e.message}`).join(" · ") : undefined,
+    };
   },
-  ["showcase-flights"],
+  ["showcase-flights", CACHE_VERSION],
   { revalidate: SHOWCASE_TTL, tags: ["showcase"] }
 );
 
@@ -84,74 +116,77 @@ const cachedHotels = unstable_cache(
     checkout: string,
     currency: string
   ): Promise<ShowcaseHotels> => {
-    const adults = 2;
-    const nights = Math.max(
-      1,
-      Math.round((new Date(checkout).getTime() - new Date(checkin).getTime()) / 864e5)
-    );
-    try {
-      const res = await shop({
-        city,
-        countryCode: country,
-        checkin,
-        checkout,
-        occupancies: [{ adults }],
-        currency,
-        guestNationality: country,
-      });
-      return {
-        city,
-        hotels: res.hotels.slice(0, 3),
-        supplierCount: res.queried,
-        liveSuppliers: res.suppliers.filter((s) => s.live).map((s) => s.name),
-        nights,
-        adults,
-      };
-    } catch (e) {
-      return {
-        city,
-        hotels: [],
-        supplierCount: 0,
-        liveSuppliers: [],
-        nights,
-        adults,
-        error: String((e as Error).message || e),
-      };
-    }
+    const res = await shop({
+      city,
+      countryCode: country,
+      checkin,
+      checkout,
+      occupancies: [{ adults: HOTEL_ADULTS }],
+      currency,
+      guestNationality: country,
+    });
+    if (res.hotels.length === 0) throw new NoResults("No rates returned for these dates.");
+    return {
+      city,
+      hotels: res.hotels.slice(0, 3),
+      supplierCount: res.queried,
+      liveSuppliers: res.suppliers.filter((s) => s.live).map((s) => s.name),
+      nights: nightsBetween(checkin, checkout),
+      adults: HOTEL_ADULTS,
+    };
   },
-  ["showcase-hotels"],
+  ["showcase-hotels", CACHE_VERSION],
   { revalidate: SHOWCASE_TTL, tags: ["showcase"] }
 );
 
 const cachedDestination = unstable_cache(
   async (from: string, to: string, date: string, currency: string) => {
-    try {
-      const res = await shopFlights({
-        origin: from,
-        destination: to,
-        departDate: date,
-        adults: 1,
-        cabin: "economy",
-        currency,
-      });
-      const best = res.flights[0];
-      return best ? { sell: best.best.priced.sell, currency: best.best.priced.currency } : null;
-    } catch {
-      return null;
-    }
+    const res = await shopFlights({
+      origin: from,
+      destination: to,
+      departDate: date,
+      adults: 1,
+      cabin: "economy",
+      currency,
+    });
+    const best = res.flights[0];
+    // Null here would be cached for six hours, so a momentary blank turns into
+    // "search fares" on the destination cards for the rest of the afternoon.
+    if (!best) throw new NoResults("No fare returned.");
+    return { sell: best.best.priced.sell, currency: best.best.priced.currency };
   },
-  ["showcase-destination"],
+  ["showcase-destination", CACHE_VERSION],
   { revalidate: DEST_TTL, tags: ["showcase"] }
 );
 
 // Currency is part of the cache key, so switching it can't serve a cached page
 // still priced in the previous one.
-export function showcaseFlights(currency: string) {
-  return cachedFlights("DEL", "DXB", isoDaysOut(21), currency);
+export async function showcaseFlights(currency: string): Promise<ShowcaseFlights> {
+  const route = { from: "DEL", to: "DXB", date: isoDaysOut(21) };
+  try {
+    return await cachedFlights(route.from, route.to, route.date, currency);
+  } catch (e) {
+    return { route, flights: [], supplierCount: 0, liveSuppliers: [], error: reason(e) };
+  }
 }
 
-export function showcaseHotels(currency: string) {
-  return cachedHotels("Mumbai", "IN", isoDaysOut(30), isoDaysOut(33), currency);
+export async function showcaseHotels(currency: string): Promise<ShowcaseHotels> {
+  const city = "Mumbai";
+  const checkin = isoDaysOut(30);
+  const checkout = isoDaysOut(33);
+  try {
+    return await cachedHotels(city, "IN", checkin, checkout, currency);
+  } catch (e) {
+    return {
+      city,
+      hotels: [],
+      supplierCount: 0,
+      liveSuppliers: [],
+      nights: nightsBetween(checkin, checkout),
+      adults: HOTEL_ADULTS,
+      error: reason(e),
+    };
+  }
 }
 
 export interface DestinationCard {
@@ -175,8 +210,12 @@ const DESTINATIONS = [
 
 export async function destinationCards(currency: string, origin = "DEL"): Promise<DestinationCard[]> {
   const date = isoDaysOut(28);
+  // Per card, not per row: one destination with no fare must not blank the
+  // other two, and its miss must not be cached.
   const prices = await Promise.all(
-    DESTINATIONS.map((d) => cachedDestination(origin, d.code, date, currency))
+    DESTINATIONS.map((d) =>
+      cachedDestination(origin, d.code, date, currency).catch(() => null)
+    )
   );
   return DESTINATIONS.map((d, i) => ({ ...d, from: origin, price: prices[i] }));
 }
