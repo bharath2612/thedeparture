@@ -36,6 +36,11 @@ export interface ShowcaseHotels {
   hotels: ShoppedHotel[];
   supplierCount: number;
   liveSuppliers: string[];
+  // A stay total is meaningless without the stay. "AED 1,370" reads as a
+  // nightly rate and looks wrong; "AED 1,370 · 3 nights, 2 adults" reads as
+  // what it is. The card needs these to say so.
+  nights: number;
+  adults: number;
   error?: string;
 }
 
@@ -79,13 +84,18 @@ const cachedHotels = unstable_cache(
     checkout: string,
     currency: string
   ): Promise<ShowcaseHotels> => {
+    const adults = 2;
+    const nights = Math.max(
+      1,
+      Math.round((new Date(checkout).getTime() - new Date(checkin).getTime()) / 864e5)
+    );
     try {
       const res = await shop({
         city,
         countryCode: country,
         checkin,
         checkout,
-        occupancies: [{ adults: 2 }],
+        occupancies: [{ adults }],
         currency,
         guestNationality: country,
       });
@@ -94,9 +104,19 @@ const cachedHotels = unstable_cache(
         hotels: res.hotels.slice(0, 3),
         supplierCount: res.queried,
         liveSuppliers: res.suppliers.filter((s) => s.live).map((s) => s.name),
+        nights,
+        adults,
       };
     } catch (e) {
-      return { city, hotels: [], supplierCount: 0, liveSuppliers: [], error: String((e as Error).message || e) };
+      return {
+        city,
+        hotels: [],
+        supplierCount: 0,
+        liveSuppliers: [],
+        nights,
+        adults,
+        error: String((e as Error).message || e),
+      };
     }
   },
   ["showcase-hotels"],

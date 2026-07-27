@@ -452,7 +452,7 @@ async function HotelShowcase({ currency }: { currency: string }) {
       <div style={{ marginBottom: 26, display: "flex", flexDirection: "column", gap: 10 }}>
         <span className="eyebrow">Stays · {data.city}</span>
         <h2 className="sm">
-          <span className="grad-3">Rate-shopped</span> hotels
+          Find the best hotel at the <span className="grad-3">lowest price.</span>
         </h2>
       </div>
 
@@ -487,8 +487,15 @@ async function HotelShowcase({ currency }: { currency: string }) {
                   </div>
                   <div className="foot">
                     <span style={{ display: "flex", flexDirection: "column" }}>
-                      <span className="amt">{money(p.sell, p.currency)}</span>
-                      <span className="per">total stay</span>
+                      {/* Per night leads, because that is the number a
+                          traveller compares on. The stay total follows it, with
+                          the stay spelled out — a bare total reads as a nightly
+                          rate and makes a correct price look wrong. */}
+                      <span className="amt">{money(p.sell / data.nights, p.currency)}</span>
+                      <span className="per">
+                        per night · {money(p.sell, p.currency)} for {data.nights} night
+                        {data.nights > 1 ? "s" : ""}, {data.adults} adults
+                      </span>
                     </span>
                     <span className="btn btn-glass" style={{ fontSize: 13, padding: "9px 18px" }}>
                       Book

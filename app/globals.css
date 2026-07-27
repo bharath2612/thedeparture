@@ -39,6 +39,10 @@
   --good-bg: rgba(95, 190, 147, 0.14);
   --alert: #e0765a;
 
+  /* Shared by the sticky header and the top of the search band so the two
+     meet without a seam. Change it in one place or not at all. */
+  --band-top: #141c27;
+
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --maxw: 1240px;
@@ -111,15 +115,17 @@ select:focus {
 }
 
 /* ---------------- site header ---------------- */
+/* The header carries the search band's top colour rather than the page
+   background, and drops the hairline under it, so the band reads as one
+   surface continuing from behind the nav instead of starting at a seam.
+   Opaque, not translucent: at scroll 0 there is nothing behind the header but
+   --paper, so a translucent bar samples the darker page and the seam comes
+   back exactly where we removed it. */
 .nav {
-  position: relative;
-  z-index: 40;
-  background: rgba(13, 17, 23, 0.55);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  border-bottom: 1px solid var(--rule);
   position: sticky;
   top: 0;
+  z-index: 40;
+  background: var(--band-top);
 }
 .nav-inner {
   max-width: var(--maxw);
@@ -585,11 +591,15 @@ h1 {
 
    Fields are solid rather than glass — the band is flat, so there is nothing
    to see through, and solid wins on input legibility. */
+/* The glow is centred INSIDE the band rather than above it. Sitting at -30% it
+   was brightest along the very top edge, which is the one line that has to
+   match the header exactly — so the band began with a blue lift the header
+   could not have, and the two never met cleanly. */
 .searchband {
   position: relative;
   padding: 46px 24px 44px;
-  background: radial-gradient(ellipse 80% 130% at 50% -30%, rgba(110, 168, 255, 0.18), transparent 68%),
-    linear-gradient(180deg, #141c27, var(--paper));
+  background: radial-gradient(ellipse 92% 88% at 50% 60%, rgba(110, 168, 255, 0.16), transparent 70%),
+    linear-gradient(180deg, var(--band-top), var(--paper));
   border-bottom: 1px solid var(--rule);
 }
 .searchband > .inner {
@@ -635,14 +645,21 @@ h1 {
   margin-right: 4px;
 }
 
+/* Glass. The frame colour is a light wash that shows through the 1px gaps as
+   the seams, and the fields are a dark translucent tint on top — so the
+   dividers read as light hairlines across a single pane rather than as gaps
+   between separate boxes. The blur is on the frame, once; the fields only
+   tint, or every cell would blur its neighbours' edges. */
 .searchbar {
   display: grid;
   gap: 1px;
   padding: 1px;
-  background: var(--rule-2);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.16);
   align-items: stretch;
 }
 .searchbar.flights {
@@ -652,16 +669,19 @@ h1 {
   grid-template-columns: 1.7fr 1.5fr 1.1fr auto;
 }
 .searchbar .field {
-  background: var(--surface-solid);
+  background: rgba(13, 17, 23, 0.44);
   border: 0;
   border-radius: 0;
   padding: 12px 18px;
   justify-content: center;
   gap: 4px;
   min-height: 66px;
+  transition: background 0.18s ease;
 }
+/* Focus lightens the pane rather than darkening it — the active field should
+   look like the one letting the most light through. */
 .searchbar .field:focus-within {
-  background: #1b2531;
+  background: rgba(255, 255, 255, 0.1);
   box-shadow: none;
 }
 .searchbar .field label {
@@ -685,7 +705,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-solid);
+  background: rgba(13, 17, 23, 0.44);
   border-radius: 0;
   width: 50px;
 }
