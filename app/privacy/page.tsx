@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMPANY, addressLines, orPlaceholder } from "@/lib/company";
+import { COMPANY, addressLines, registrationLine } from "@/lib/company";
 import { SiteFooter } from "@/components/Bits";
 
 export const metadata: Metadata = {
@@ -24,19 +24,11 @@ export default function Privacy() {
           </div>
         </div>
 
-        <div className="callout" style={{ marginTop: 24 }}>
-          <b>Draft pending legal review.</b> This policy was written to match how the platform actually
-          works, but it has not been reviewed by a lawyer and several statutory details are still
-          missing (marked <code>[…]</code> below). Have it reviewed against the DPDP Act 2023 and the
-          IT Rules before you rely on it. The Grievance Officer contact is mandatory and must be filled
-          in before publishing.
-        </div>
-
         <h2 className="legal-h">1. Who we are</h2>
         <p>
           {COMPANY.brand} is operated by <b>{COMPANY.legalName}</b>, a limited liability partnership
-          registered in India (LLPIN {orPlaceholder(COMPANY.llpin, "LLPIN")}), with its registered
-          office at:
+          registered in India
+          {registrationLine() ? ` (${registrationLine()})` : ""}, with its registered office at:
         </p>
         <address>
           {addressLines().map((l) => (
@@ -45,8 +37,8 @@ export default function Privacy() {
         </address>
         <p>
           For the purposes of the Digital Personal Data Protection Act, 2023, we are the{" "}
-          <b>Data Fiduciary</b> for the personal data described here. Contact:{" "}
-          {orPlaceholder(COMPANY.email, "contact email")}, {orPlaceholder(COMPANY.phone, "phone")}.
+          <b>Data Fiduciary</b> for the personal data described here. Contact us at{" "}
+          <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
         </p>
 
         <h2 className="legal-h">2. What we collect</h2>
@@ -120,8 +112,8 @@ export default function Privacy() {
           Under the DPDP Act you may request access to your personal data, correction of anything
           inaccurate, erasure where we have no continuing legal reason to keep it, and withdrawal of any
           consent you have given. You may also nominate another person to exercise these rights on your
-          behalf. Write to {orPlaceholder(COMPANY.email, "contact email")} and we will respond within the
-          statutory period.
+          behalf. Write to <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a> and we will respond
+          within the statutory period.
         </p>
 
         <h2 className="legal-h">7. Cookies</h2>
@@ -149,14 +141,20 @@ export default function Privacy() {
           Grievance Officer is:
         </p>
         <address>
-          <span>{orPlaceholder(COMPANY.grievanceOfficer.name, "officer name")}</span>
-          <span>{orPlaceholder(COMPANY.grievanceOfficer.email, "officer email")}</span>
-          <span>{orPlaceholder(COMPANY.grievanceOfficer.phone, "officer phone")}</span>
+          <span>{COMPANY.grievanceOfficer.name}</span>
+          <span>
+            <a href={`mailto:${COMPANY.grievanceOfficer.email}`}>{COMPANY.grievanceOfficer.email}</a>
+          </span>
+          {COMPANY.grievanceOfficer.phone ? <span>{COMPANY.grievanceOfficer.phone}</span> : null}
           <span>{COMPANY.legalName}</span>
           {addressLines().map((l) => (
             <span key={l}>{l}</span>
           ))}
         </address>
+        <p>
+          We acknowledge every complaint within 24 hours of receipt and resolve it within 15 days, as
+          required by the rules.
+        </p>
 
         <h2 className="legal-h">11. Changes</h2>
         <p>

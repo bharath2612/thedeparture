@@ -117,13 +117,15 @@ export function SiteFooter() {
           <Link href="/flights">Flights</Link>
           <Link href="/results">Hotels</Link>
           {showOpsPricing() && <Link href="/suppliers">Suppliers</Link>}
+          <a href={`mailto:${COMPANY.email}`}>Contact</a>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </div>
       </div>
       <div className="legalbar">
         <span>
-          {COMPANY.legalName} · {a.line1}, {a.line2}, {a.city} {a.postcode}, {a.country}
+          {COMPANY.legalName} · {a.line1}, {a.line2}, {a.city} {a.postcode}, {a.country} ·{" "}
+          {COMPANY.email}
         </span>
         <span className="copy">© 2026 {COMPANY.legalName.toUpperCase()}</span>
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMPANY, addressLines, orPlaceholder } from "@/lib/company";
+import { COMPANY, addressLines, registrationLine } from "@/lib/company";
 import { SiteFooter } from "@/components/Bits";
 
 export const metadata: Metadata = {
@@ -24,18 +24,10 @@ export default function Terms() {
           </div>
         </div>
 
-        <div className="callout" style={{ marginTop: 24 }}>
-          <b>Draft pending legal review.</b> Written to match how the platform actually operates, but
-          not reviewed by a lawyer. Several details are still missing (marked <code>[…]</code>). Two
-          clauses in particular need a commercial decision before you publish: <b>cancellation and
-          refund handling (§6)</b> and <b>limitation of liability (§9)</b>.
-        </div>
-
         <h2 className="legal-h">1. About these terms</h2>
         <p>
-          These terms govern your use of {COMPANY.brand}, operated by <b>{COMPANY.legalName}</b>, LLPIN{" "}
-          {orPlaceholder(COMPANY.llpin, "LLPIN")}, GSTIN {orPlaceholder(COMPANY.gstin, "GSTIN")},
-          registered at:
+          These terms govern your use of {COMPANY.brand}, operated by <b>{COMPANY.legalName}</b>
+          {registrationLine() ? `, ${registrationLine()}` : ""}, registered at:
         </p>
         <address>
           {addressLines().map((l) => (
@@ -100,13 +92,15 @@ export default function Terms() {
           non-refundable.
         </p>
         <p>
-          Where a refund is due, we claim it from the supplier and pass it on once received. Airline and
-          hotel refunds routinely take several billing cycles, and we cannot pay out money a supplier has
-          not yet released.{" "}
-          <b>
-            [Service fee on cancellation, and whether our margin is refundable, to be confirmed before
-            publication.]
-          </b>
+          Where a refund is due, we claim it from the supplier and pass on the full amount we receive.
+          Airline and hotel refunds routinely take several billing cycles, and we cannot pay out money a
+          supplier has not yet released.
+        </p>
+        <p>
+          <b>We do not charge a separate cancellation or handling fee.</b> The service margin included
+          in the price you paid is not refunded on cancellation, because it covers work already
+          performed — sourcing the rate, issuing the booking and servicing it up to the point of
+          cancellation. Everything the supplier releases is yours.
         </p>
 
         <h2 className="legal-h">7. Delays, disruption and our service promise</h2>
@@ -127,16 +121,24 @@ export default function Terms() {
         <p>
           We are liable for our own failures in arranging your booking. We are not liable for the acts
           or omissions of an airline, hotel or other supplier, nor for events outside reasonable control
-          — weather, air traffic control, strikes, civil unrest, epidemics, or government action.{" "}
-          <b>[Liability cap to be set on legal advice before publication.]</b>
+          — weather, air traffic control, strikes, civil unrest, epidemics, or government action.
         </p>
-        <p>Nothing in these terms limits liability that cannot lawfully be limited.</p>
+        <p>
+          Where we are liable, <b>our total liability for any claim arising out of a booking is limited
+          to the total amount you paid us for that booking.</b> We are not liable for indirect or
+          consequential loss, including loss of profit, missed connections not booked through us, or
+          loss of enjoyment.
+        </p>
+        <p>
+          Nothing in these terms limits liability that cannot lawfully be limited, including liability
+          for death or personal injury caused by our negligence, or for fraud.
+        </p>
 
         <h2 className="legal-h">10. Complaints</h2>
         <p>
           Tell us first — most problems are fixed fastest by the agent already on your booking. Write to{" "}
-          {orPlaceholder(COMPANY.email, "contact email")}. If you are not satisfied, escalate to the
-          Grievance Officer named in our <Link href="/privacy">Privacy Policy</Link>.
+          <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. If you are not satisfied, escalate to
+          the Grievance Officer named in our <Link href="/privacy">Privacy Policy</Link>.
         </p>
 
         <h2 className="legal-h">11. Governing law</h2>

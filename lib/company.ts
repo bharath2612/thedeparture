@@ -2,10 +2,12 @@
 // footer all read from here so the registered details can never drift apart
 // between pages.
 //
-// Fields left empty are ones nobody has given us yet. They render as a visible
-// "[to be added]" rather than a plausible-looking invention — a wrong LLPIN or
-// a made-up grievance-officer contact in a published policy is worse than an
-// obvious gap, and under the IT Rules the grievance contact is mandatory.
+// Fields we do not have are left empty, and the pages OMIT the sentence that
+// would have carried them rather than printing a gap. A published policy
+// should never show "[LLPIN to be added]" to a customer, and it should never
+// show an invented one either — so the only honest option is to not make the
+// claim until the number exists. Fill a field in here and the sentence
+// reappears on its own.
 
 export const COMPANY = {
   legalName: "K Global Travels LLP",
@@ -18,13 +20,23 @@ export const COMPANY = {
     postcode: "500033",
     country: "India",
   },
-  // ── Not yet supplied — fill these before publishing ──
+  email: "connect@thedeparture.ai",
+
+  // Mandatory under the Information Technology Act, 2000 and the rules made
+  // under it. A phone number is not published because we have not been given
+  // one; the email and registered address are.
+  grievanceOfficer: {
+    name: "Phani Reddy Kurre",
+    email: "phani.k@thedeparture.ai",
+    phone: "",
+  },
+
+  // ── Not yet supplied. While empty, the pages simply do not assert them. ──
   llpin: "",
   gstin: "",
-  email: "",
   phone: "",
-  grievanceOfficer: { name: "", email: "", phone: "" },
-  lastUpdated: "25 July 2026",
+
+  lastUpdated: "27 July 2026",
 } as const;
 
 export function addressLines(): string[] {
@@ -36,7 +48,14 @@ export function addressOneLine(): string {
   return addressLines().join(", ");
 }
 
-// Renders a missing detail visibly instead of silently printing nothing.
-export function orPlaceholder(value: string, what: string): string {
-  return value || `[${what} to be added]`;
+// "LLPIN 123, GSTIN 456" / "LLPIN 123" / "" — joins only the parts we hold, so
+// a missing registration number removes itself from the sentence instead of
+// leaving a dangling label or a stray comma.
+export function registrationLine(): string {
+  return [
+    COMPANY.llpin && `LLPIN ${COMPANY.llpin}`,
+    COMPANY.gstin && `GSTIN ${COMPANY.gstin}`,
+  ]
+    .filter(Boolean)
+    .join(", ");
 }
