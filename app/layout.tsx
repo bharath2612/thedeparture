@@ -17,14 +17,15 @@ const SITE = "https://thedeparture.ai";
 // og:description is deliberately short. WhatsApp shows about two lines before
 // truncating, so the claim has to survive being cut off.
 const SHARE_TITLE = "The Departure · Flights and hotels at the lowest price";
-const SHARE_DESC =
-  "Find flights and hotels at the lowest price, and never worry about the service. A real person is on every trip.";
+// Short on purpose. WhatsApp truncates the description at roughly two lines,
+// so the promise has to land before the cut rather than after it.
+const SHARE_DESC = "Find flights and hotels at the lowest price. We've got your back 24/7.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: "The Departure · Flights and hotels at the lowest price",
   description:
-    "We check every supplier we are connected to and get you the lowest price we can find on flights and hotels. A real person stays with the trip, round the clock.",
+    "We check every supplier we are connected to and get you the lowest price we can find on flights and hotels. And we've got your back 24/7.",
   icons: {
     icon: "/logo.png",
   },
