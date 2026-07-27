@@ -34,6 +34,7 @@ export default function Suppliers() {
         <h2 className="sm" style={{ marginTop: 44, fontSize: 24 }}>
           Air
         </h2>
+        <div className="tablewrap">
         <table className="suptable">
           <thead>
             <tr>
@@ -68,10 +69,12 @@ export default function Suppliers() {
             ))}
           </tbody>
         </table>
+        </div>
 
         <h2 className="sm" style={{ marginTop: 44, fontSize: 24 }}>
           Hotels
         </h2>
+        <div className="tablewrap">
         <table className="suptable">
           <thead>
             <tr>
@@ -98,6 +101,7 @@ export default function Suppliers() {
             ))}
           </tbody>
         </table>
+        </div>
 
         <div className="callout" style={{ marginTop: 30 }}>
           To onboard a supplier: add its key to <b>.env.local</b> (e.g. <b>DUFFEL_TOKEN=…</b> or{" "}

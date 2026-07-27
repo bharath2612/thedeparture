@@ -38,6 +38,34 @@ const STEPS = [
   },
 ];
 
+// The band headline is a function of the tab: someone on Hotels should not be
+// sold a flight promise. Same claim underneath both — cheapest net, real agent
+// — said in the language of what they're actually shopping for. The badge is
+// deliberately identical across tabs: it's the brand line, not a mode line, so
+// it must not flicker when the tab changes.
+const BADGE = "Smart travel · AI powered · We are with you on every trip";
+
+const BAND_COPY = {
+  flights: {
+    badge: BADGE,
+    title: (
+      <>
+        Book smarter. <span className="grad">Land cheaper.</span>
+      </>
+    ),
+    sub: "One search across every supplier we're connected to — and a named agent on the trip, not a ticket queue.",
+  },
+  hotels: {
+    badge: BADGE,
+    title: (
+      <>
+        Check in for less. <span className="grad">Stay a night longer.</span>
+      </>
+    ),
+    sub: "We price the same room across every connected supplier and sell you the cheapest — with the same agent on the booking if anything moves.",
+  },
+} as const;
+
 const PILLARS = [
   {
     num: "01",
@@ -70,28 +98,12 @@ export default async function Home() {
 
   return (
     <>
-      <section className="hero-shell">
-        <div className="hero-card">
-          <div className="hero-bg" style={{ backgroundImage: 'url("/hero.png")' }} />
-          <div className="hero-scrim" />
-          <div className="hero-dots" />
-
-          <div className="hero-copy">
-            <span className="badge">
-              <span className="live-dot" />
-              Smart travel · AI powered · We are with you on every trip
-            </span>
-            <h1>
-              The booking platform that helps you book{" "}
-              <span className="grad">smarter &amp; cheaper</span> — and has your back{" "}
-              <span className="grad-2">24/7.</span>
-            </h1>
-            <p className="standfirst">
-              Book with us and save real money on your flights and hotels. And if anything goes wrong,
-              our agents are here to help — round the clock. No stress.
-            </p>
-          </div>
-
+      {/* Search first. The traveller who arrives ready to book should not have
+          to scroll past a manifesto to type a city. The brand statement still
+          exists — it moved below, where it reads as a reason to trust us rather
+          than an obstacle between the header and the search field. */}
+      <section className="searchband">
+        <div className="inner">
           <SearchPanel
             defaults={{
               depart: isoDaysOut(21),
@@ -102,11 +114,40 @@ export default async function Home() {
             flightsLive={flightsLive}
             flightsNote={air[0]?.note || "Flight rail not connected"}
             supplierLine={supplierLine}
+            copy={BAND_COPY}
           />
+        </div>
+      </section>
 
-          <Suspense fallback={<DestSkeleton />}>
-            <DestinationCards currency={currency} />
-          </Suspense>
+      <section className="section" id="destinations">
+        <div className="sechead">
+          <span className="eyebrow">Trending from Delhi</span>
+          <h2>
+            Where people are <span className="grad-3">going next.</span>
+          </h2>
+        </div>
+        <Suspense fallback={<DestSkeleton />}>
+          <DestinationCards currency={currency} />
+        </Suspense>
+      </section>
+
+      <section className="hero-shell">
+        <div className="hero-card brandband">
+          <div className="hero-bg" style={{ backgroundImage: 'url("/hero.png")' }} />
+          <div className="hero-scrim" />
+          <div className="hero-dots" />
+
+          <div className="hero-copy">
+            <h2 className="herohead">
+              The booking platform that helps you book{" "}
+              <span className="grad">smarter &amp; cheaper</span> — and has your back{" "}
+              <span className="grad-2">24/7.</span>
+            </h2>
+            <p className="standfirst">
+              Book with us and save real money on your flights and hotels. And if anything goes wrong,
+              our agents are here to help — round the clock. No stress.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -359,7 +400,7 @@ async function FlightShowcase({ currency }: { currency: string }) {
                     incl. {pct}% margin
                   </span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div className="rowact">
                   <Link
                     className={`btn ${i === 0 ? "btn-white" : "btn-glass"}`}
                     style={{ fontSize: 13, padding: "10px 20px" }}

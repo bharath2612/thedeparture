@@ -1,23 +1,40 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import PlacePicker, { type Place } from "./PlacePicker";
 import DateRangePicker from "./DateRangePicker";
+import TravellersPicker, { type CabinId } from "./TravellersPicker";
 
-// The glass search bar from the landing design, wired to the real rails.
+// The search bar, wired to the real rails.
 // Flights → /flights (Duffel + any other live air supplier)
 // Hotels  → /results (the multi-supplier hotel rate-shop)
 //
 // Both destination fields search the full worldwide index (5,328 airports,
 // 236 countries) rather than a curated shortlist. Dates come from a real
 // two-month range calendar, not a native date input.
+//
+// Layout follows the OTA convention: mode tabs and the trip toggle sit ABOVE
+// the bar, and the bar itself is one connected object rather than a row of
+// separate boxes — the accent colour is its background, showing through 3px
+// gaps as the dividers between fields. Everything the traveller has to fill in
+// is inside one ring, and the only thing outside it is the choice of what
+// they're shopping for.
 
 export interface SearchDefaults {
   depart: string;
   return: string;
   checkin: string;
   checkout: string;
+}
+
+// The band headline changes with the tab, so it has to read the tab state,
+// which lives here. The words themselves stay in page.tsx — this component
+// picks which set to show, it doesn't own the copy.
+export interface BandCopy {
+  badge: string;
+  title: ReactNode;
+  sub: string;
 }
 
 const DEFAULT_FROM: Place = {
@@ -50,11 +67,13 @@ export default function SearchPanel({
   flightsLive,
   flightsNote,
   supplierLine,
+  copy,
 }: {
   defaults: SearchDefaults;
   flightsLive: boolean;
   flightsNote: string;
   supplierLine: string;
+  copy: Record<"flights" | "hotels", BandCopy>;
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"flights" | "hotels">(flightsLive ? "flights" : "hotels");
@@ -67,7 +86,7 @@ export default function SearchPanel({
   const [depart, setDepart] = useState(defaults.depart);
   const [ret, setRet] = useState(defaults.return);
   const [pax, setPax] = useState(1);
-  const [cabin, setCabin] = useState("economy");
+  const [cabin, setCabin] = useState<CabinId>("economy");
 
   // hotels
   const [dest, setDest] = useState<Place>(DEFAULT_CITY);
@@ -112,9 +131,25 @@ export default function SearchPanel({
     router.push(`/results?${q}`);
   }
 
+  function swap() {
+    setFrom(to);
+    setTo(from);
+  }
+
+  const c = copy[tab];
+
   return (
     <div className="searchpanel">
-      <div className="searchcard">
+      <div className="bandcopy">
+        <span className="badge">
+          <span className="live-dot" />
+          {c.badge}
+        </span>
+        <h1>{c.title}</h1>
+        <p className="sub">{c.sub}</p>
+      </div>
+
+      <div className="barhead">
         <div className="tabs">
           <button
             type="button"
@@ -133,126 +168,113 @@ export default function SearchPanel({
           </button>
         </div>
 
-        {tab === "flights" ? (
-          <form onSubmit={searchFlights}>
-            <div className="trips">
-              <button
-                type="button"
-                className={`trip ${trip === "return" ? "on" : ""}`}
-                onClick={() => setTrip("return")}
-              >
-                Return
-              </button>
-              <button
-                type="button"
-                className={`trip ${trip === "oneway" ? "on" : ""}`}
-                onClick={() => setTrip("oneway")}
-              >
-                One way
-              </button>
-            </div>
-            <div className="searchgrid flights">
-              <PlacePicker
-                inputId="from"
-                label="From"
-                kind="airport"
-                value={from}
-                onChange={setFrom}
-                placeholder="City or airport"
-              />
-              <PlacePicker
-                inputId="to"
-                label="To"
-                kind="airport"
-                value={to}
-                onChange={setTo}
-                placeholder="City or airport"
-              />
-              <DateRangePicker
-                id="flightdates"
-                label={trip === "return" ? "Depart · Return" : "Depart"}
-                start={depart}
-                end={ret}
-                rangeMode={trip === "return"}
-                onChange={(s, e2) => {
-                  setDepart(s);
-                  setRet(e2);
-                }}
-              />
-              <div className="field">
-                <label htmlFor="pax">Travellers</label>
-                <select
-                  id="pax"
-                  value={`${pax}|${cabin}`}
-                  onChange={(e) => {
-                    const [p, c] = e.target.value.split("|");
-                    setPax(Number(p));
-                    setCabin(c);
-                  }}
-                >
-                  {[1, 2, 3, 4, 5, 6].flatMap((n) =>
-                    ["economy", "premium_economy", "business", "first"].map((c) => (
-                      <option key={`${n}|${c}`} value={`${n}|${c}`}>
-                        {n} · {c === "premium_economy" ? "Premium" : c[0].toUpperCase() + c.slice(1)}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <button className="searchbtn" type="submit" disabled={loading}>
-                {loading ? "Searching…" : "Search"}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <form onSubmit={searchHotels}>
-            <div className="searchgrid hotels">
-              <PlacePicker
-                inputId="dest"
-                label="Destination"
-                kind="city"
-                value={dest}
-                onChange={setDest}
-                placeholder="Any city worldwide"
-              />
-              <DateRangePicker
-                id="staydates"
-                label="Check-in · Check-out"
-                start={checkin}
-                end={checkout}
-                rangeMode
-                onChange={(s, e2) => {
-                  setCheckin(s);
-                  setCheckout(e2);
-                }}
-              />
-              <div className="field">
-                <label htmlFor="guests">Guests</label>
-                <select id="guests" value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <option key={n} value={n}>
-                      {n} · 1 room
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button className="searchbtn" type="submit" disabled={loading}>
-                {loading ? "Searching…" : "Search"}
-              </button>
-            </div>
-          </form>
-        )}
-
-        {error && (
-          <div className="searchfoot" style={{ color: "var(--alert)", paddingTop: 0 }}>
-            {error}
+        {tab === "flights" && (
+          <div className="trips">
+            <button
+              type="button"
+              className={`trip ${trip === "return" ? "on" : ""}`}
+              onClick={() => setTrip("return")}
+            >
+              Return
+            </button>
+            <button
+              type="button"
+              className={`trip ${trip === "oneway" ? "on" : ""}`}
+              onClick={() => setTrip("oneway")}
+            >
+              One way
+            </button>
           </div>
         )}
+      </div>
 
-        <div className="searchfoot">
-          <span className="dot" />
-          <span>{supplierLine}</span>
+      {tab === "flights" ? (
+        <form onSubmit={searchFlights}>
+          <div className="searchbar flights">
+            <PlacePicker
+              inputId="from"
+              label="From"
+              kind="airport"
+              value={from}
+              onChange={setFrom}
+              placeholder="City or airport"
+            />
+            <div className="swapcell">
+              <button type="button" className="swapbtn" onClick={swap} aria-label="Swap origin and destination">
+                ⇄
+              </button>
+            </div>
+            <PlacePicker
+              inputId="to"
+              label="To"
+              kind="airport"
+              value={to}
+              onChange={setTo}
+              placeholder="City or airport"
+            />
+            <DateRangePicker
+              id="flightdates"
+              label={trip === "return" ? "Depart · Return" : "Depart"}
+              start={depart}
+              end={ret}
+              rangeMode={trip === "return"}
+              onChange={(s, e2) => {
+                setDepart(s);
+                setRet(e2);
+              }}
+            />
+            <TravellersPicker
+              id="pax"
+              mode="flights"
+              count={pax}
+              cabin={cabin}
+              onCount={setPax}
+              onCabin={setCabin}
+            />
+            <button className="searchbtn" type="submit" disabled={loading}>
+              {loading ? "Searching…" : "Search"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={searchHotels}>
+          <div className="searchbar hotels">
+            <PlacePicker
+              inputId="dest"
+              label="Destination"
+              kind="city"
+              value={dest}
+              onChange={setDest}
+              placeholder="Any city worldwide"
+            />
+            <DateRangePicker
+              id="staydates"
+              label="Check-in · Check-out"
+              start={checkin}
+              end={checkout}
+              rangeMode
+              onChange={(s, e2) => {
+                setCheckin(s);
+                setCheckout(e2);
+              }}
+            />
+            <TravellersPicker id="guests" mode="hotels" count={guests} onCount={setGuests} />
+            <button className="searchbtn" type="submit" disabled={loading}>
+              {loading ? "Searching…" : "Search"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {error && (
+        <div className="searchfoot" style={{ color: "var(--alert)" }}>
+          {error}
         </div>
+      )}
+
+      <div className="searchfoot">
+        <span className="dot" />
+        <span>{supplierLine}</span>
       </div>
     </div>
   );

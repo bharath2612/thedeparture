@@ -211,7 +211,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
                   </span>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <div className="rowact">
                   {canBook && bookOffer ? (
                     <Link
                       className={`btn ${i === 0 ? "btn-white" : "btn-glass"}`}

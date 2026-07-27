@@ -27,7 +27,9 @@ export default function BookForm({
           <div className="eyebrow" style={{ marginBottom: 10 }}>
             Traveller {i + 1}
           </div>
-          <div className="searchgrid" style={{ padding: 0, gridTemplateColumns: "0.6fr 1fr 1fr 1fr" }}>
+          {/* columns live in CSS, not inline: an inline grid-template-columns
+              outranks every media query, so this form could never collapse. */}
+          <div className="searchgrid paxgrid">
             <div className="field">
               <label htmlFor={`title_${i}`}>Title</label>
               <select id={`title_${i}`} name={`title_${i}`} defaultValue="mr">
@@ -57,7 +59,7 @@ export default function BookForm({
       <div className="eyebrow" style={{ margin: "18px 0 10px" }}>
         Contact — this is the thread your agent uses
       </div>
-      <div className="searchgrid" style={{ padding: 0, gridTemplateColumns: "1fr 1fr" }}>
+      <div className="searchgrid contactgrid">
         <div className="field">
           <label htmlFor="email">Email</label>
           <input id="email" name="email" type="email" placeholder="you@example.com" required />
