@@ -845,6 +845,16 @@ h1 {
 .picker {
   position: relative;
 }
+/* The secondary line ("United Arab Emirates" under "Dubai"). It hung 17px
+   BELOW its own field, which the old floating card had room for. Inside the
+   search bar it either gets clipped by the frame's overflow or, once the grid
+   stacks, prints straight across the field underneath — visible as ghost text
+   over CHECK-IN on a phone and over GUESTS on a tablet. It belongs in the
+   field's own flow. */
+.searchbar .picker-sub {
+  position: static;
+  margin-top: 1px;
+}
 .picker-sub {
   position: absolute;
   left: 14px;
