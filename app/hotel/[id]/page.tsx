@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { shopHotel, prebookVia } from "@/lib/rateshop";
 import { priceUp, money, defaultMarkupPct } from "@/lib/markup";
 import { LiteApiError } from "@/lib/liteapi";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
@@ -103,7 +104,7 @@ export default async function HotelDetail({
           {[hotel?.city, hotel?.country].filter(Boolean).join(", ") || city} · {dateLabel} · {nights}{" "}
           night{nights > 1 ? "s" : ""} · {adults} guest{adults > 1 ? "s" : ""}
         </div>
-        {hotel && hotel.supplierCount > 1 && (
+        {showOpsPricing() && hotel && hotel.supplierCount > 1 && (
           <div className="supcompare">
             Priced across {hotel.supplierCount} suppliers:{" "}
             {hotel.quotes.map((q, i) => (
@@ -143,13 +144,15 @@ export default async function HotelDetail({
               </div>
               <div className="rprice">
                 <div className="amt">{money(room.priced.sell, room.priced.currency)}</div>
-                <div
-                  className="per"
-                  style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}
-                >
-                  net {money(room.priced.net, room.priced.currency)} · +{markupPct}% ={" "}
-                  {money(room.priced.markup, room.priced.currency)}
-                </div>
+                {showOpsPricing() && (
+                  <div
+                    className="per"
+                    style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}
+                  >
+                    net {money(room.priced.net, room.priced.currency)} · +{markupPct}% ={" "}
+                    {money(room.priced.markup, room.priced.currency)}
+                  </div>
+                )}
                 <form action={reserve}>
                   <input type="hidden" name="supplier" value={room.supplier} />
                   <input type="hidden" name="supplierName" value={room.supplierName} />
@@ -170,7 +173,7 @@ export default async function HotelDetail({
         })}
       </div>
 
-      {rooms.length > 0 && (
+      {showOpsPricing() && rooms.length > 0 && (
         <div className="opstrip">
           <div>
             <div className="k">Cheapest net (you pay)</div>

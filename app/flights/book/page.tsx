@@ -4,6 +4,7 @@ import { getFlightSupplier } from "@/lib/flights/registry";
 import { formatDuration } from "@/lib/flights/types";
 import { money, priceUp, defaultMarkupPct } from "@/lib/markup";
 import { SiteFooter } from "@/components/Bits";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
@@ -134,24 +135,26 @@ export default async function BookPage({
           ))}
         </div>
 
-        <div className="opstrip">
-          <div>
-            <div className="k">Supplier net</div>
-            <div className="v">{money(p.net, p.currency)}</div>
+        {showOpsPricing() && (
+          <div className="opstrip">
+            <div>
+              <div className="k">Supplier net</div>
+              <div className="v">{money(p.net, p.currency)}</div>
+            </div>
+            <div>
+              <div className="k">Your margin ({p.markupPct}%)</div>
+              <div className="v good">{money(p.markup, p.currency)}</div>
+            </div>
+            <div>
+              <div className="k">Traveller pays</div>
+              <div className="v">{money(p.sell, p.currency)}</div>
+            </div>
+            <div className="say">
+              The traveller sees one price. Net and margin are operator-only — this strip renders only
+              when SHOW_OPS_PRICING is set, which production does not set.
+            </div>
           </div>
-          <div>
-            <div className="k">Your margin ({p.markupPct}%)</div>
-            <div className="v good">{money(p.markup, p.currency)}</div>
-          </div>
-          <div>
-            <div className="k">Traveller pays</div>
-            <div className="v">{money(p.sell, p.currency)}</div>
-          </div>
-          <div className="say">
-            The traveller sees one price. Net and margin are operator-only — this strip never renders on
-            a customer-facing screen.
-          </div>
-        </div>
+        )}
 
         <div className="suprow" style={{ marginTop: 18 }}>
           <span className="supbadge">

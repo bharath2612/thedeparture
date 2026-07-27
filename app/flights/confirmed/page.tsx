@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { money, priceUp } from "@/lib/markup";
 import { SiteFooter, AgentChip, SlaBadge } from "@/components/Bits";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
@@ -35,14 +36,18 @@ export default async function Confirmed({
               <span>Traveller pays</span>
               <span>{money(p.sell, currency)}</span>
             </div>
-            <div className="tline">
-              <span>Supplier net</span>
-              <span>{money(p.net, currency)}</span>
-            </div>
-            <div className="tline total">
-              <span>Your margin</span>
-              <span>{money(p.markup, currency)}</span>
-            </div>
+            {showOpsPricing() && (
+              <>
+                <div className="tline">
+                  <span>Supplier net</span>
+                  <span>{money(p.net, currency)}</span>
+                </div>
+                <div className="tline total">
+                  <span>Your margin</span>
+                  <span>{money(p.markup, currency)}</span>
+                </div>
+              </>
+            )}
             <div className="tline locked" style={{ borderBottom: "none" }}>
               <span>Status</span>
               <span>CONFIRMED</span>

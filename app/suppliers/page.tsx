@@ -1,11 +1,18 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { SUPPLIERS } from "@/lib/suppliers/registry";
 import { FLIGHT_SUPPLIERS } from "@/lib/flights/registry";
 import { SiteFooter } from "@/components/Bits";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
+// This page lists who we buy from and which of them are connected — our supply
+// chain, on a page that was linked from the public nav and footer. It 404s
+// unless the ops view is on.
 export default function Suppliers() {
+  if (!showOpsPricing()) notFound();
+
   const hotels = SUPPLIERS.map((s) => s.status());
   const air = FLIGHT_SUPPLIERS.map((s) => s.status());
   const live = hotels.filter((r) => r.live).length + air.filter((r) => r.live).length;

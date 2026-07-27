@@ -1,6 +1,7 @@
 import Link from "next/link";
 import CurrencySwitcher from "./CurrencySwitcher";
 import { COMPANY } from "@/lib/company";
+import { showOpsPricing } from "@/lib/opsview";
 import type { CurrencyCode } from "@/lib/currency";
 
 // The three components the landing design imported (StatusPill, AgentChip,
@@ -74,18 +75,25 @@ export function SiteHeader({
           <Link className={active === "how" ? "on" : ""} href="/#how">
             How it works
           </Link>
-          <Link className={active === "agencies" ? "on" : ""} href="/suppliers">
-            Suppliers
-          </Link>
+          {showOpsPricing() && (
+            <Link className={active === "agencies" ? "on" : ""} href="/suppliers">
+              Suppliers
+            </Link>
+          )}
           <Link className={active === "support" ? "on" : ""} href="/#support">
             Support
           </Link>
         </nav>
         <div className="navright">
           <CurrencySwitcher current={currency.code} source={currency.source} />
-          <span className="envtag">
-            ENV <b className={env.live ? "env-live" : "env-sandbox"}>{env.label}</b>
-          </span>
+          {/* SANDBOX/LIVE is a deployment fact about us, not information for a
+              traveller — and printing "SANDBOX" beside a price invites exactly
+              the wrong question. */}
+          {showOpsPricing() && (
+            <span className="envtag">
+              ENV <b className={env.live ? "env-live" : "env-sandbox"}>{env.label}</b>
+            </span>
+          )}
         </div>
       </div>
     </header>
@@ -108,7 +116,7 @@ export function SiteFooter() {
         <div className="links">
           <Link href="/flights">Flights</Link>
           <Link href="/results">Hotels</Link>
-          <Link href="/suppliers">Suppliers</Link>
+          {showOpsPricing() && <Link href="/suppliers">Suppliers</Link>}
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </div>

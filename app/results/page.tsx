@@ -4,6 +4,7 @@ import { money } from "@/lib/markup";
 import { LiteApiError } from "@/lib/liteapi";
 import { resolveCurrency } from "@/lib/currency.server";
 import { SiteFooter } from "@/components/Bits";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,7 @@ export default async function Results({ searchParams }: { searchParams: Promise<
   // LiteAPI prices natively in the requested currency, so this is a real quote
   // in the traveller's currency — not one of ours converted after the fact.
   const currency = (await resolveCurrency()).code;
+  const ops = showOpsPricing();
 
   let result: Awaited<ReturnType<typeof shop>> | null = null;
   let error: string | null = null;
@@ -73,8 +75,8 @@ export default async function Results({ searchParams }: { searchParams: Promise<
           </div>
         </div>
         <div className="meta">
-          {hotels.length} hotel{hotels.length !== 1 ? "s" : ""} · prices in {currency} · incl. {markupPct}%
-          margin
+          {hotels.length} hotel{hotels.length !== 1 ? "s" : ""} · prices in {currency}
+          {ops ? ` · incl. ${markupPct}% margin` : ""}
         </div>
       </div>
 
@@ -83,15 +85,18 @@ export default async function Results({ searchParams }: { searchParams: Promise<
         <span>
           <b>Rate-shop:</b> {liveCount} of {suppliers.length} suppliers live
         </span>
-        {suppliers.map((s) => (
-          <span key={s.code}>
-            <span className={`dot ${s.live ? "on" : "off"}`} />
-            {s.name}
-          </span>
-        ))}
-        <Link className="back" href="/suppliers" style={{ marginLeft: "auto" }}>
-          manage suppliers →
-        </Link>
+        {ops &&
+          suppliers.map((s) => (
+            <span key={s.code}>
+              <span className={`dot ${s.live ? "on" : "off"}`} />
+              {s.name}
+            </span>
+          ))}
+        {ops && (
+          <Link className="back" href="/suppliers" style={{ marginLeft: "auto" }}>
+            manage suppliers →
+          </Link>
+        )}
       </div>
 
       {error && <div className="error">LiteAPI: {error}</div>}
@@ -141,7 +146,7 @@ export default async function Results({ searchParams }: { searchParams: Promise<
                   )}
                   <span className="supbadge">{h.best.board}</span>
                 </div>
-                {h.supplierCount > 1 && (
+                {ops && h.supplierCount > 1 && (
                   <div className="supcompare">
                     {h.quotes.map((q, i) => (
                       <span key={q.supplier} style={{ marginRight: 14 }}>
@@ -167,9 +172,11 @@ export default async function Results({ searchParams }: { searchParams: Promise<
                 <div className="per">
                   {money(p.sell / nights, p.currency)} / night · total
                 </div>
-                <div className="per" style={{ color: "var(--good)" }}>
-                  margin {money(p.markup, p.currency)}
-                </div>
+                {ops && (
+                  <div className="per" style={{ color: "var(--good)" }}>
+                    margin {money(p.markup, p.currency)}
+                  </div>
+                )}
                 <div className="cta">View rooms →</div>
               </div>
             </Link>
@@ -178,8 +185,18 @@ export default async function Results({ searchParams }: { searchParams: Promise<
       </div>
 
       <div className="footer">
-        We query every connected aggregator, pick the cheapest net per hotel, and add your {markupPct}%
-        margin. Add more suppliers → cheaper wins. <Link href="/suppliers">suppliers →</Link>
+        {ops ? (
+          <>
+            We query every connected aggregator, pick the cheapest net per hotel, and add your{" "}
+            {markupPct}% margin. Add more suppliers → cheaper wins.{" "}
+            <Link href="/suppliers">suppliers →</Link>
+          </>
+        ) : (
+          <>
+            We query every supplier we&apos;re connected to and show you the cheapest room we can find
+            — the same room, priced against itself.
+          </>
+        )}
       </div>
     </div>
   );

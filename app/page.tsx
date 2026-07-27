@@ -8,6 +8,7 @@ import { activeFlightSuppliers, FLIGHT_SUPPLIERS } from "@/lib/flights/registry"
 import { activeSuppliers } from "@/lib/suppliers/registry";
 import { formatDuration } from "@/lib/flights/types";
 import { resolveCurrency } from "@/lib/currency.server";
+import { showOpsPricing } from "@/lib/opsview";
 
 // Air times arrive as local ISO strings ("2026-08-19T18:40:00"). Slicing beats
 // Date parsing here: constructing a Date would re-project them into the
@@ -115,7 +116,14 @@ export default async function Home() {
               checkout: isoDaysOut(33),
             }}
             flightsLive={flightsLive}
-            flightsNote={air[0]?.note || "Flight rail not connected"}
+            // The adapter's status note is a developer diagnostic — it names the
+            // env var to set, and it reached the customer as the tab's title
+            // attribute. Gated like everything else operational.
+            flightsNote={
+              showOpsPricing()
+                ? air[0]?.note || "Flight rail not connected"
+                : "Flight search is opening soon"
+            }
             supplierLine={supplierLine}
             copy={BAND_COPY}
           />
@@ -232,9 +240,15 @@ export default async function Home() {
               a status update with an agent already assigned, rebook options held, and a WhatsApp thread
               open — before you even notice.
             </p>
-            <Link className="btn btn-white" href="/suppliers">
-              See the supplier board
-            </Link>
+            {showOpsPricing() ? (
+              <Link className="btn btn-white" href="/suppliers">
+                See the supplier board
+              </Link>
+            ) : (
+              <Link className="btn btn-white" href="/results">
+                Find a place to stay
+              </Link>
+            )}
           </div>
           <div className="right">
             <div className="slab">
@@ -324,6 +338,14 @@ function ShowcaseSkeleton({ label }: { label: string }) {
 async function FlightShowcase({ currency }: { currency: string }) {
   const data = await showcaseFlights(currency);
   const pct = defaultMarkupPct();
+  const ops = showOpsPricing();
+
+  // With no air supplier connected there is nothing honest to put here. Show a
+  // customer an empty section apologising for itself and you have advertised a
+  // broken product; show them nothing and the page simply moves on to the
+  // hotels, which do work. The diagnostic stays on the ops view, where the
+  // person who can fix it will see it.
+  if (data.flights.length === 0 && !ops) return null;
   const dateLabel = new Date(data.route.date).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -399,9 +421,11 @@ async function FlightShowcase({ currency }: { currency: string }) {
                 </div>
                 <div className="stack-r">
                   <span className="amt">{money(p.sell, p.currency)}</span>
-                  <span className="was" style={{ textDecoration: "none", color: "var(--ink-3)" }}>
-                    incl. {pct}% margin
-                  </span>
+                  {showOpsPricing() && (
+                    <span className="was" style={{ textDecoration: "none", color: "var(--ink-3)" }}>
+                      incl. {pct}% margin
+                    </span>
+                  )}
                 </div>
                 <div className="rowact">
                   <Link
@@ -464,7 +488,7 @@ async function HotelShowcase({ currency }: { currency: string }) {
                   <div className="foot">
                     <span style={{ display: "flex", flexDirection: "column" }}>
                       <span className="amt">{money(p.sell, p.currency)}</span>
-                      <span className="per">total stay · incl. margin</span>
+                      <span className="per">total stay</span>
                     </span>
                     <span className="btn btn-glass" style={{ fontSize: 13, padding: "9px 18px" }}>
                       Book

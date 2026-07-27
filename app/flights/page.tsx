@@ -4,6 +4,7 @@ import { formatDuration, type CabinClass } from "@/lib/flights/types";
 import { money } from "@/lib/markup";
 import { SiteFooter } from "@/components/Bits";
 import { resolveCurrency } from "@/lib/currency.server";
+import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
   // has no currency parameter, so an offer is always shown in the currency it
   // was actually quoted in. We never convert.
   const currency = (await resolveCurrency()).code;
+  const ops = showOpsPricing();
 
   const res = await shopFlights({
     origin: from,
@@ -88,45 +90,62 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
           </div>
           <div className="meta">
             {flights.length} itinerar{flights.length === 1 ? "y" : "ies"}
-            {minBags ? ` with ${minBags}+ checked bag` : ""} · incl. {res.markupPct}% margin
+            {minBags ? ` with ${minBags}+ checked bag` : ""}
+            {ops ? ` · incl. ${res.markupPct}% margin` : ""}
           </div>
         </div>
 
+        {/* How many suppliers we checked is a selling point. WHICH suppliers,
+            and which of them can ticket, is our supply chain — ops only. */}
         <div className="shopbar">
           <span>
             <b>Air rate-shop:</b> {liveCount} of {res.suppliers.length} supplier
             {res.suppliers.length > 1 ? "s" : ""} live
           </span>
-          {res.suppliers.map((s) => (
-            <span key={s.code}>
-              <span className={`dot ${s.live ? "on" : "off"}`} />
-              {s.name}
-              {s.live && !s.bookable ? " (shop only)" : ""}
-            </span>
-          ))}
+          {ops &&
+            res.suppliers.map((s) => (
+              <span key={s.code}>
+                <span className={`dot ${s.live ? "on" : "off"}`} />
+                {s.name}
+                {s.live && !s.bookable ? " (shop only)" : ""}
+              </span>
+            ))}
           <span style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
             <Link className="chip" href={qs({ bags: minBags ? "" : "1" })}>
               {minBags ? "✓ 1+ checked bag" : "Only with checked bag"}
             </Link>
-            <Link className="back" href="/suppliers">
-              suppliers →
-            </Link>
+            {ops && (
+              <Link className="back" href="/suppliers">
+                suppliers →
+              </Link>
+            )}
           </span>
         </div>
 
-        {res.errors.map((e) => (
-          <div className="error" key={e.supplier}>
-            {e.supplier}: {e.message}
-          </div>
-        ))}
+        {/* Supplier error text is upstream wording aimed at us, not at a
+            traveller, so it stays on the ops view. */}
+        {ops &&
+          res.errors.map((e) => (
+            <div className="error" key={e.supplier}>
+              {e.supplier}: {e.message}
+            </div>
+          ))}
 
-        {liveCount === 0 && (
-          <div className="callout">
-            <b>No air supplier connected.</b> Set <code>DUFFEL_TOKEN</code> (self-serve signup, no IATA
-            needed — it issues on its own accreditation) and this page goes live immediately. Amadeus
-            Self-Service can be added alongside for a second price, but it cannot issue tickets.
-          </div>
-        )}
+        {liveCount === 0 &&
+          (ops ? (
+            <div className="callout">
+              <b>No air supplier connected.</b> Set <code>DUFFEL_TOKEN</code> (self-serve signup, no
+              IATA needed — it issues on its own accreditation) and this page goes live immediately.
+              Amadeus Self-Service can be added alongside for a second price, but it cannot issue
+              tickets.
+            </div>
+          ) : (
+            <div className="callout">
+              <b>Flight search is not open yet.</b> We&apos;re finishing our airline ticketing
+              connection. Hotels are live now, and an agent can quote a flight for you in the
+              meantime — <Link href="/results">search stays →</Link>
+            </div>
+          ))}
 
         {liveCount > 0 && flights.length === 0 && (
           <div className="empty">
@@ -161,7 +180,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
                       )}
                       {!canBook && <span className="supbadge demo">shop only</span>}
                     </span>
-                    {f.supplierCount > 1 && (
+                    {ops && f.supplierCount > 1 && (
                       <span className="supcompare">
                         {f.quotes.map((q, qi) => (
                           <span key={q.supplier} style={{ marginRight: 14 }}>
@@ -206,9 +225,11 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
 
                 <div className="stack-r">
                   <span className="amt">{money(p.sell, p.currency)}</span>
-                  <span className="was" style={{ textDecoration: "none" }}>
-                    net {money(p.net, p.currency)} · margin {money(p.markup, p.currency)}
-                  </span>
+                  {ops && (
+                    <span className="was" style={{ textDecoration: "none" }}>
+                      net {money(p.net, p.currency)} · margin {money(p.markup, p.currency)}
+                    </span>
+                  )}
                 </div>
 
                 <div className="rowact">
@@ -233,7 +254,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
           })}
         </div>
 
-        {bookableCount === 0 && liveCount > 0 && (
+        {ops && bookableCount === 0 && liveCount > 0 && (
           <div className="callout">
             Every connected air supplier is <b>shop-only</b> — these are real prices but nothing here can
             be ticketed. Add Duffel (or a consolidator) to close the loop.
