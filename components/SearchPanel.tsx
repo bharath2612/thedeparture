@@ -65,13 +65,11 @@ export default function SearchPanel({
   defaults,
   flightsLive,
   flightsNote,
-  supplierLine,
   copy,
 }: {
   defaults: SearchDefaults;
   flightsLive: boolean;
   flightsNote: string;
-  supplierLine: string;
   copy: Record<"flights" | "hotels", BandCopy>;
 }) {
   const router = useRouter();
@@ -270,11 +268,6 @@ export default function SearchPanel({
           {error}
         </div>
       )}
-
-      <div className="searchfoot">
-        <span className="dot" />
-        <span>{supplierLine}</span>
-      </div>
     </div>
   );
 }

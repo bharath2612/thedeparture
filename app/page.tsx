@@ -4,8 +4,7 @@ import SearchPanel from "@/components/SearchPanel";
 import { AgentChip, ChatDock, SiteFooter, SlaBadge, StatusPill } from "@/components/Bits";
 import { destinationCards, showcaseFlights, showcaseHotels } from "@/lib/showcase";
 import { money, defaultMarkupPct } from "@/lib/markup";
-import { activeFlightSuppliers, FLIGHT_SUPPLIERS } from "@/lib/flights/registry";
-import { activeSuppliers } from "@/lib/suppliers/registry";
+import { FLIGHT_SUPPLIERS } from "@/lib/flights/registry";
 import { formatDuration } from "@/lib/flights/types";
 import { resolveCurrency } from "@/lib/currency.server";
 import { showOpsPricing } from "@/lib/opsview";
@@ -92,14 +91,7 @@ const PILLARS = [
 export default async function Home() {
   const currency = (await resolveCurrency()).code;
   const air = FLIGHT_SUPPLIERS.map((s) => s.status());
-  const liveAir = air.filter((s) => s.live);
-  const liveHotel = activeSuppliers().map((s) => s.status());
-  const flightsLive = liveAir.length > 0;
-  const totalLive = liveAir.length + liveHotel.length;
-
-  const supplierLine = totalLive
-    ? `We query ${totalLive} connected supplier${totalLive > 1 ? "s" : ""} in parallel and get you the lowest price we can find, every time.`
-    : "No suppliers connected yet. Add a key to go live.";
+  const flightsLive = air.some((s) => s.live);
 
   return (
     <>
@@ -125,7 +117,6 @@ export default async function Home() {
                 ? air[0]?.note || "Flight rail not connected"
                 : "Flight search is opening soon"
             }
-            supplierLine={supplierLine}
             copy={BAND_COPY}
           />
         </div>
