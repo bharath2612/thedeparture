@@ -12,7 +12,7 @@ import "server-only";
 // console back.
 //
 // This is a display gate, not a security boundary. It decides what is
-// rendered, so the numbers never reach the customer's HTML at all — but
+// rendered, so the numbers never reach the customer's HTML at all, but
 // anything genuinely secret belongs behind auth, not behind this.
 export function showOpsPricing(): boolean {
   return process.env.SHOW_OPS_PRICING === "true";

@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/Bits";
 import { resolveCurrency } from "@/lib/currency.server";
 
 export const metadata: Metadata = {
-  title: "The Departure — smart travel, AI powered",
+  title: "The Departure · smart travel, AI powered",
   description:
-    "The booking platform that helps you book smarter and cheaper — and has your back 24/7. We rate-shop every supplier, sell the cheapest net, and put a named agent on every trip.",
+    "The booking platform that helps you book smarter and cheaper, and has your back 24/7. We rate-shop every supplier, sell the cheapest net, and put a named agent on every trip.",
   icons: {
     icon: "/logo.png",
   },

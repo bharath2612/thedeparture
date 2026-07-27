@@ -16,10 +16,9 @@ import TravellersPicker, { type CabinId } from "./TravellersPicker";
 //
 // Layout follows the OTA convention: mode tabs and the trip toggle sit ABOVE
 // the bar, and the bar itself is one connected object rather than a row of
-// separate boxes — the accent colour is its background, showing through 3px
-// gaps as the dividers between fields. Everything the traveller has to fill in
-// is inside one ring, and the only thing outside it is the choice of what
-// they're shopping for.
+// separate boxes. The frame's background shows through 1px gaps as the seams
+// between fields. Everything the traveller has to fill in is inside the one
+// pane; the only thing outside it is the choice of what they are shopping for.
 
 export interface SearchDefaults {
   depart: string;
@@ -29,7 +28,7 @@ export interface SearchDefaults {
 }
 
 // The band headline changes with the tab, so it has to read the tab state,
-// which lives here. The words themselves stay in page.tsx — this component
+// which lives here. The words themselves stay in page.tsx, this component
 // picks which set to show, it doesn't own the copy.
 export interface BandCopy {
   badge: string;

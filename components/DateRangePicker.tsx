@@ -10,7 +10,7 @@ import { useAnchored } from "./useAnchored";
 const TWO_MONTH_WIDTH = 522;
 const ONE_MONTH_WIDTH = 252;
 
-// Two-month calendar with range selection. No dependency — a date picker is
+// Two-month calendar with range selection. No dependency, a date picker is
 // ~150 lines and pulling in a library would cost more bytes than the whole
 // airport index.
 //
@@ -123,9 +123,9 @@ export default function DateRangePicker({
 
   const summary = rangeMode
     ? start && end
-      ? `${formatShort(start)} — ${formatShort(end)}`
+      ? `${formatShort(start)} to ${formatShort(end)}`
       : start
-        ? `${formatShort(start)} — …`
+        ? `${formatShort(start)} to …`
         : "Select dates"
     : start
       ? formatShort(start)

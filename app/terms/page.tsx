@@ -4,7 +4,7 @@ import { COMPANY, addressLines, registrationLine } from "@/lib/company";
 import { SiteFooter } from "@/components/Bits";
 
 export const metadata: Metadata = {
-  title: `Terms & Conditions — ${COMPANY.brand}`,
+  title: `Terms & Conditions · ${COMPANY.brand}`,
   description: `The terms on which ${COMPANY.legalName} provides travel booking services.`,
 };
 
@@ -88,7 +88,7 @@ export default function Terms() {
         <h2 className="legal-h">6. Changes, cancellations and refunds</h2>
         <p>
           Whether a booking can be changed or cancelled, and on what terms, is set by the supplier&apos;s
-          fare or rate rules — shown to you before you book. Many of the lowest fares and rates are
+          fare or rate rules, which are shown to you before you book. Many of the lowest fares and rates are
           non-refundable.
         </p>
         <p>
@@ -99,7 +99,7 @@ export default function Terms() {
         <p>
           <b>We do not charge a separate cancellation or handling fee.</b> The service margin included
           in the price you paid is not refunded on cancellation, because it covers work already
-          performed — sourcing the rate, issuing the booking and servicing it up to the point of
+          performed: sourcing the rate, issuing the booking and servicing it up to the point of
           cancellation. Everything the supplier releases is yours.
         </p>
 
@@ -120,8 +120,8 @@ export default function Terms() {
         <h2 className="legal-h">9. Liability</h2>
         <p>
           We are liable for our own failures in arranging your booking. We are not liable for the acts
-          or omissions of an airline, hotel or other supplier, nor for events outside reasonable control
-          — weather, air traffic control, strikes, civil unrest, epidemics, or government action.
+          or omissions of an airline, hotel or other supplier, nor for events outside reasonable control,
+          such as weather, air traffic control, strikes, civil unrest, epidemics, or government action.
         </p>
         <p>
           Where we are liable, <b>our total liability for any claim arising out of a booking is limited
@@ -136,7 +136,7 @@ export default function Terms() {
 
         <h2 className="legal-h">10. Complaints</h2>
         <p>
-          Tell us first — most problems are fixed fastest by the agent already on your booking. Write to{" "}
+          Tell us first. Most problems are fixed fastest by the agent already on your booking. Write to{" "}
           <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. If you are not satisfied, escalate to
           the Grievance Officer named in our <Link href="/privacy">Privacy Policy</Link>.
         </p>

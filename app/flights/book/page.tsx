@@ -53,7 +53,7 @@ export default async function BookPage({
   let paxCount = 1;
   let error: string | null = null;
   try {
-    // The offer carries one passenger slot per traveller it was priced for —
+    // The offer carries one passenger slot per traveller it was priced for ,
     // that count, not a guess from the URL, decides how many name fields to ask
     // for. Duffel rejects an order whose passenger list doesn't match.
     const [o, slots] = await Promise.all([
@@ -150,7 +150,7 @@ export default async function BookPage({
               <div className="v">{money(p.sell, p.currency)}</div>
             </div>
             <div className="say">
-              The traveller sees one price. Net and margin are operator-only — this strip renders only
+              The traveller sees one price. Net and margin are operator-only, so this strip renders only
               when SHOW_OPS_PRICING is set, which production does not set.
             </div>
           </div>

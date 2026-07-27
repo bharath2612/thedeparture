@@ -7,7 +7,7 @@ import type {
 } from "./flights/types";
 import { priceUp, defaultMarkupPct, type Priced } from "./markup";
 
-// The flight rate-shop — the air twin of lib/rateshop.ts.
+// The flight rate-shop, the air twin of lib/rateshop.ts.
 //
 // Two things make it different from hotels, and both are in our favour:
 //
@@ -90,7 +90,7 @@ export async function shopFlights(q: FlightQuery): Promise<FlightShopResult> {
 
     // Cross-currency nets are not comparable. Rather than invent an FX rate,
     // rank within the query currency when one supplier quotes it, else fall
-    // back to the first supplier — and flag the group as not comparable so the
+    // back to the first supplier, and flag the group as not comparable so the
     // UI never prints a "you saved X" it cannot stand behind.
     const rankable = comparable
       ? perSupplier

@@ -20,11 +20,11 @@ export function makeStubAdapter(opts: {
       name: opts.name,
       connected: connected(),
       live: false, // flip to true once search() is implemented
-      note: connected() ? `Key present — adapter not yet implemented. ${opts.note}` : `Not connected. ${opts.note}`,
+      note: connected() ? `Key present. Adapter not yet implemented. ${opts.note}` : `Not connected. ${opts.note}`,
     };
   }
 
-  // Never throws — a missing supplier must not break the shop.
+  // Never throws, a missing supplier must not break the shop.
   async function search(_q: SearchQuery): Promise<NormalizedHotel[]> {
     return [];
   }

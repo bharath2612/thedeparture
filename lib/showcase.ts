@@ -8,7 +8,7 @@ import type { ShoppedHotel } from "./rateshop";
 // Live data for the landing page.
 //
 // The showcase sections show REAL rate-shopped prices, not the mock's invented
-// numbers — but a landing page cannot pay an API round-trip per visitor. Two
+// numbers, but a landing page cannot pay an API round-trip per visitor. Two
 // protections:
 //   1. unstable_cache with a TTL, so N visitors cost one supplier call.
 //   2. the date is part of the cache key, so results roll over daily instead of
@@ -16,8 +16,8 @@ import type { ShoppedHotel } from "./rateshop";
 // LiteAPI's free tier is priced on look-to-book; speculative landing-page
 // traffic is exactly what blows that ratio if left uncached.
 
-const SHOWCASE_TTL = 900; // 15 min — the headline rows
-const DEST_TTL = 21_600; // 6 h — "from" prices are indicative, not quotes
+const SHOWCASE_TTL = 900; // 15 min, the headline rows
+const DEST_TTL = 21_600; // 6 h, "from" prices are indicative, not quotes
 
 function isoDaysOut(days: number): string {
   return new Date(Date.now() + days * 864e5).toISOString().slice(0, 10);
@@ -165,7 +165,7 @@ export interface DestinationCard {
 
 // The photograph belongs with the destination, not with the page: a card that
 // shows a real price for Singapore should show Singapore. Adding a fourth
-// destination without adding its image is the mistake to avoid — the type makes
+// destination without adding its image is the mistake to avoid, the type makes
 // `image` required so that can't compile.
 const DESTINATIONS = [
   { city: "Dubai", code: "DXB", dur: "6s", image: "/img/dest-DXB.webp" },

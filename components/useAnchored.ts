@@ -11,7 +11,7 @@ import { computePlacement } from "@/lib/anchor.mjs";
 // positioned dropdown; the second makes the card a containing block for
 // fixed-position descendants, so `position: fixed` gets trapped and clipped
 // too. The only reliable escape is to render the popover in a portal on
-// <body> and place it by hand — which is what this hook computes.
+// <body> and place it by hand, which is what this hook computes.
 //
 // It also does what a naive `left: 0` cannot: keep the panel on screen. A
 // 320px list hanging off a 180px column in the right-hand grid cell runs

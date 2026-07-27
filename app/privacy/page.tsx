@@ -4,7 +4,7 @@ import { COMPANY, addressLines, registrationLine } from "@/lib/company";
 import { SiteFooter } from "@/components/Bits";
 
 export const metadata: Metadata = {
-  title: `Privacy Policy — ${COMPANY.brand}`,
+  title: `Privacy Policy · ${COMPANY.brand}`,
   description: `How ${COMPANY.legalName} collects, uses and protects personal data.`,
 };
 
@@ -45,25 +45,25 @@ export default function Privacy() {
         <p>We collect only what a booking actually requires:</p>
         <ul>
           <li>
-            <b>Search details</b> — origin, destination, dates, number of travellers, cabin or room
+            <b>Search details.</b> origin, destination, dates, number of travellers, cabin or room
             preference. Collected the moment you search, whether or not you book.
           </li>
           <li>
-            <b>Traveller details</b> — name as it appears on your passport or ID, date of birth,
+            <b>Traveller details.</b> name as it appears on your passport or ID, date of birth,
             gender where an airline requires it. Airlines and hotels will not issue a booking without
             these.
           </li>
           <li>
-            <b>Contact details</b> — email and phone number, including WhatsApp number where you choose
+            <b>Contact details.</b> email and phone number, including WhatsApp number where you choose
             to reach us that way.
           </li>
           <li>
-            <b>Technical data</b> — IP address, browser type, and pages viewed. We use the country
+            <b>Technical data.</b> IP address, browser type, and pages viewed. We use the country
             derived from your IP address to pick a default display currency; you can override it at any
             time and your choice is stored in a cookie on your device.
           </li>
           <li>
-            <b>Payment data</b> — handled by our payment provider. We do not receive or store full card
+            <b>Payment data.</b> handled by our payment provider. We do not receive or store full card
             numbers.
           </li>
         </ul>
@@ -71,19 +71,19 @@ export default function Privacy() {
         <h2 className="legal-h">3. Why we use it, and on what basis</h2>
         <ul>
           <li>
-            <b>To fulfil your booking</b> — we must pass traveller details to the airline, hotel, or
+            <b>To fulfil your booking.</b> we must pass traveller details to the airline, hotel, or
             supplier who issues it. Without this we cannot provide the service you asked for.
           </li>
           <li>
-            <b>To support you</b> — to contact you about schedule changes, delays, cancellations and
+            <b>To support you.</b> to contact you about schedule changes, delays, cancellations and
             refunds, and to let an assigned agent act on your booking.
           </li>
           <li>
-            <b>To meet legal obligations</b> — tax, accounting, and any government or regulatory
+            <b>To meet legal obligations.</b> tax, accounting, and any government or regulatory
             requirement applicable to travel bookings.
           </li>
           <li>
-            <b>With your consent</b> — for marketing messages, which you can withdraw at any time
+            <b>With your consent.</b> for marketing messages, which you can withdraw at any time
             without affecting any booking you have already made.
           </li>
         </ul>
@@ -118,7 +118,7 @@ export default function Privacy() {
 
         <h2 className="legal-h">7. Cookies</h2>
         <p>
-          We use a small number of functional cookies — including one that remembers your chosen display
+          We use a small number of functional cookies, including one that remembers your chosen display
           currency. We do not use advertising or cross-site tracking cookies.
         </p>
 

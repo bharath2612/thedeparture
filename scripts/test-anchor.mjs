@@ -13,7 +13,7 @@ function check(name, cond, detail) {
     pass++;
   } else {
     fail++;
-    console.log(`  FAIL  ${name}${detail ? ` — ${detail}` : ""}`);
+    console.log(`  FAIL  ${name}${detail ? `, ${detail}` : ""}`);
     return;
   }
   console.log(`  ok    ${name}`);

@@ -7,7 +7,7 @@ import { showOpsPricing } from "@/lib/opsview";
 
 export const dynamic = "force-dynamic";
 
-// This page lists who we buy from and which of them are connected — our supply
+// This page lists who we buy from and which of them are connected, our supply
 // chain, on a page that was linked from the public nav and footer. It 404s
 // unless the ops view is on.
 export default function Suppliers() {
@@ -34,7 +34,7 @@ export default function Suppliers() {
           <p className="standfirst" style={{ marginTop: 18, maxWidth: "62ch" }}>
             The platform queries all live suppliers in parallel and sells the lowest net. Onboarding one
             is: get its key, implement its adapter, flip it live. No single supplier is cheapest on
-            everything — that&apos;s the whole point.
+            everything, which is the whole point.
           </p>
         </section>
 
@@ -113,7 +113,7 @@ export default function Suppliers() {
         <div className="callout" style={{ marginTop: 30 }}>
           To onboard a supplier: add its key to <b>.env.local</b> (e.g. <b>DUFFEL_TOKEN=…</b> or{" "}
           <b>REZLIVE_KEY=…</b>), implement its adapter, and register it. Air and hotel rails share the
-          same shape — fan out, group by identity, sell the cheapest net. The one rule the code
+          same shape: fan out, group by identity, sell the cheapest net. The one rule the code
           enforces: a supplier without ticketing authority can price a flight but can never be handed a
           booking.
         </div>

@@ -83,7 +83,7 @@ export default async function Quote({ searchParams }: { searchParams: Promise<SP
           </div>
           {showOpsPricing() && (
             <p className="callout" style={{ marginTop: 22 }}>
-              This is the number the traveller sees — <b>one price, no components.</b> Behind it: net{" "}
+              This is the number the traveller sees: <b>one price, no components.</b> Behind it: net{" "}
               {money(net, ccy)} + your {sp.pct}% margin {money(markup, ccy)}. Next step in the build:
               collect guest details, debit the agent wallet, and call <b>/rates/book</b> to confirm.
             </p>

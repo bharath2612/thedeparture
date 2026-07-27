@@ -1,11 +1,11 @@
-// Server-only LiteAPI client. The API key never reaches the browser — every
+// Server-only LiteAPI client. The API key never reaches the browser, every
 // call goes through our /api routes. Contract verified against the live v3.0
 // sandbox (search -> rates -> prebook -> book).
 
 import "server-only";
 
 const BASE = "https://api.liteapi.travel/v3.0";
-// LiteAPI's public sandbox key — lets the portal run out of the box with test
+// LiteAPI's public sandbox key, lets the portal run out of the box with test
 // data. Set LITEAPI_KEY in the environment to use your own sandbox/prod key.
 const PUBLIC_SANDBOX_KEY = "sand_c0155ab8-c683-4f26-8f94-b5e92c5797b9";
 

@@ -57,7 +57,7 @@ export default function BookForm({
       ))}
 
       <div className="eyebrow" style={{ margin: "18px 0 10px" }}>
-        Contact — this is the thread your agent uses
+        Contact details. This is the thread your agent uses
       </div>
       <div className="searchgrid contactgrid">
         <div className="field">

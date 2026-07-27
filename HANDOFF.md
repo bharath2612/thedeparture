@@ -1,4 +1,4 @@
-# TheDeparture — where this stands
+# TheDeparture, where this stands
 
 **Last worked: 2026-07-25.** Run `npm run dev` → http://localhost:3070.
 
@@ -9,13 +9,13 @@ Madhapur, Hyderabad 500033. Brand: **The Departure**.
 
 ## Blocked on you (two values, five minutes)
 
-1. **`DUFFEL_TOKEN`** — paste a `duffel_test_…` into `.env.local`. Flights go
+1. **`DUFFEL_TOKEN`**, paste a `duffel_test_…` into `.env.local`. Flights go
    real and bookable with no code change. Self-serve signup at duffel.com, ~1 min.
-2. **GitHub repo URL** — the repo is committed locally (6 commits) with no
+2. **GitHub repo URL**, the repo is committed locally (6 commits) with no
    remote. `git remote add origin <url> && git push -u origin main`, then Vercel.
 
 Also needed before the legal pages can be published: **LLPIN, GSTIN, contact
-email/phone, and the Grievance Officer** (name/email/phone — mandatory under the
+email/phone, and the Grievance Officer** (name/email/phone, mandatory under the
 IT Rules). They live in `lib/company.ts` and currently render as visible
 `[…]` placeholders on `/privacy` and `/terms`. Two clauses need a commercial
 decision, flagged inline in `/terms`: **§6** is our margin refundable on
@@ -39,7 +39,7 @@ cancellation / is there a service fee, and **§9** the liability cap.
 
 ---
 
-## Decisions that are load-bearing — don't quietly undo these
+## Decisions that are load-bearing, don't quietly undo these
 
 **1. We never convert currency.** Changing currency re-queries the supplier. A
 price is only ever shown in a currency the supplier actually priced in. LiteAPI
@@ -71,17 +71,17 @@ what blows that ratio. Duffel charges $0.005/search past 1500:1.
 
 ## Flight API landscape (researched 2026-07-25)
 
-- **Duffel — the answer.** Only self-serve, no-IATA rail left. Issues on its own
+- **Duffel, the answer.** Only self-serve, no-IATA rail left. Issues on its own
   accreditation. Test mode free. Live: $3/confirmed order, 1% managed content,
   $1/paid ancillary, $0.005/search past a 1500:1 search-to-book ratio.
-- **Amadeus Self-Service — DEAD.** Amadeus decommissioned the self-service
+- **Amadeus Self-Service, DEAD.** Amadeus decommissioned the self-service
   developer portal on **17 July 2026**: registration shut, existing keys
   disabled. Only the Enterprise portal survives (contract + account manager).
   The adapter is kept for a legacy key or a future Enterprise deal, and its
   status note says CLOSED so nobody chases a key that can't be issued.
-- **Travelpayouts** — affiliate, redirects out, can't issue. Useless here.
-- **Kiwi Tequila** — approval required, not self-serve.
-- **TBO / TripJack** — phase 2. KYC + wallet, India domestic + LCC breadth.
+- **Travelpayouts**, affiliate, redirects out, can't issue. Useless here.
+- **Kiwi Tequila**, approval required, not self-serve.
+- **TBO / TripJack**, phase 2. KYC + wallet, India domestic + LCC breadth.
 
 ---
 
@@ -100,12 +100,12 @@ lib/currency.server.ts    cookie > IP > env resolution (next/headers)
 lib/company.ts            single source for the legal entity
 lib/anchor.mjs            popover placement maths (pure, tested)
 data/airports.json        347 KB, built by scripts/build-airports.js
-scripts/test-anchor.mjs   22 assertions — node scripts/test-anchor.mjs
+scripts/test-anchor.mjs   22 assertions, node scripts/test-anchor.mjs
 ```
 
 Flight identity is exact (carrier + flight number + date), unlike the fuzzy
 name+city `mapKey` hotels still use. Cross-supplier hotel mapping remains the
-known weak point — it will mis-match at 3+ hotel suppliers and needs
+known weak point, it will mis-match at 3+ hotel suppliers and needs
 GIATA/Vervotech before then.
 
 ---
@@ -119,7 +119,7 @@ GIATA/Vervotech before then.
   browser is available.
 - **Disk was 100% full** (0 bytes of 238 GB) at the start of this session. I
   cleared the 11 GB npm cache; you're at ~96%. `Downloads` is **~20 GB** and is
-  the obvious next win — your call, I haven't touched it.
+  the obvious next win, your call, I haven't touched it.
 - `taskkill //F //IM node.exe` before `npm run build`, or the dev server holds
   `.next` and the build dies with EPERM.
 - `PHOTO-2026-07-17-15-04-41.jpg` sits in the repo root, deliberately

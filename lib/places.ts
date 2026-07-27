@@ -11,7 +11,7 @@ import raw from "@/data/airports.json";
 
 interface RawData {
   countries: Record<string, string>;
-  // [iata, name, city, countryCode, rank, alt] — rank 0 = large, 1 = medium, 2 = small
+  // [iata, name, city, countryCode, rank, alt], rank 0 = large, 1 = medium, 2 = small
   airports: [string, string, string, string, number, string][];
 }
 
@@ -19,8 +19,8 @@ interface RawData {
 // widened (string|number)[][] from the JSON import.
 const data = raw as unknown as RawData;
 
-// OurAirports records some cities under their older or official name — CCJ is
-// "Calicut", not Kozhikode — and its keyword column doesn't always fill the gap.
+// OurAirports records some cities under their older or official name, CCJ is
+// "Calicut", not Kozhikode, and its keyword column doesn't always fill the gap.
 // These are the corridor renames a traveller will actually type. Kept small and
 // explicit rather than pulling in a geocoding dependency.
 const ALIASES: Record<string, string[]> = {
@@ -83,7 +83,7 @@ const KEYS = AIRPORTS.map((a, i) => ({
 }));
 
 // One entry per (city, country). A city is as good as its best airport, so
-// rank carries through — that's what puts London ahead of Londrina.
+// rank carries through, that's what puts London ahead of Londrina.
 const CITY_ENTRIES: { place: CityPlace; alt: string }[] = (() => {
   const byKey = new Map<string, { place: CityPlace; alt: string }>();
   for (let i = 0; i < AIRPORTS.length; i++) {
@@ -132,7 +132,7 @@ function scoreOf(
 }
 
 // Same score means same kind of match, so break the tie on airport size and
-// then on how much of the name the query actually covered — "lon" matches both
+// then on how much of the name the query actually covered, "lon" matches both
 // London and Long Beach at score 2, and the shorter name is the one meant.
 function compare(
   aScore: number,

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { useAnchored } from "./useAnchored";
 
 // The occupancy control. It replaces a <select> that held the full cartesian
-// product of travellers × cabin — 24 options to pick two independent things.
+// product of travellers × cabin, 24 options to pick two independent things.
 // Two things, two controls: a stepper and a cabin list, in one popover, with
 // a summary line in the bar. Same pattern every OTA uses, for the same reason.
 //
@@ -46,7 +46,7 @@ export default function TravellersPicker({
 
   useEffect(() => setMounted(true), []);
 
-  // Close on a click outside BOTH the field and the portalled popover — the
+  // Close on a click outside BOTH the field and the portalled popover, the
   // popover is not a DOM descendant of the field, so one check isn't enough.
   useEffect(() => {
     function onDocDown(e: MouseEvent) {

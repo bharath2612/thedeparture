@@ -7,7 +7,7 @@ import "server-only";
 // accreditation. Test tokens (duffel_test_…) book against test airlines with
 // no money movement; production tokens (duffel_live_…) issue real tickets.
 //
-// Docs: https://duffel.com/docs/api/v2 — verified against the live schema.
+// Docs: https://duffel.com/docs/api/v2, verified against the live schema.
 
 const BASE = "https://api.duffel.com";
 const VERSION = "v2";
@@ -45,7 +45,7 @@ async function call<T>(
       "Content-Type": "application/json",
     },
     body: init.body ? JSON.stringify(init.body) : undefined,
-    // Air prices are volatile and offers expire in minutes — never cache them.
+    // Air prices are volatile and offers expire in minutes, never cache them.
     cache: "no-store",
   });
 
@@ -62,7 +62,7 @@ async function call<T>(
     } catch {
       /* keep raw text */
     }
-    throw new Error(`Duffel ${res.status} on ${path} — ${detail}`);
+    throw new Error(`Duffel ${res.status} on ${path}: ${detail}`);
   }
   return JSON.parse(text) as T;
 }
@@ -126,7 +126,7 @@ export interface DuffelOfferPassenger {
 
 export interface DuffelOffer {
   id: string;
-  total_amount: string; // decimal string — never parse as float for money maths
+  total_amount: string; // decimal string, never parse as float for money maths
   total_currency: string;
   base_amount?: string;
   tax_amount?: string | null;

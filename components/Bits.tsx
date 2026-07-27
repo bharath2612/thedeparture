@@ -5,7 +5,7 @@ import { showOpsPricing } from "@/lib/opsview";
 import type { CurrencyCode } from "@/lib/currency";
 
 // The three components the landing design imported (StatusPill, AgentChip,
-// SlaBadge) plus the shared header/footer/chat dock. Rebuilt as real React —
+// SlaBadge) plus the shared header/footer/chat dock. Rebuilt as real React ,
 // the design shipped them as separate design-canvas documents.
 
 export function StatusPill({
@@ -87,7 +87,7 @@ export function SiteHeader({
         <div className="navright">
           <CurrencySwitcher current={currency.code} source={currency.source} />
           {/* SANDBOX/LIVE is a deployment fact about us, not information for a
-              traveller — and printing "SANDBOX" beside a price invites exactly
+              traveller, and printing "SANDBOX" beside a price invites exactly
               the wrong question. */}
           {showOpsPricing() && (
             <span className="envtag">

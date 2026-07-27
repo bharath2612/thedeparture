@@ -29,7 +29,7 @@ export default async function Results({ searchParams }: { searchParams: Promise<
   const adults = Math.max(1, Number(sp.adults) || 2);
   const nights = nightsBetween(checkin, checkout);
   // LiteAPI prices natively in the requested currency, so this is a real quote
-  // in the traveller's currency — not one of ours converted after the fact.
+  // in the traveller's currency, not one of ours converted after the fact.
   const currency = (await resolveCurrency()).code;
   const ops = showOpsPricing();
 
@@ -193,8 +193,8 @@ export default async function Results({ searchParams }: { searchParams: Promise<
           </>
         ) : (
           <>
-            We query every supplier we&apos;re connected to and show you the cheapest room we can find
-            — the same room, priced against itself.
+            We query every supplier we&apos;re connected to and show you the cheapest room we can find,
+            the same room priced against itself.
           </>
         )}
       </div>

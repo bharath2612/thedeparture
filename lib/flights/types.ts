@@ -1,11 +1,11 @@
-// The flight supplier abstraction — the air-side twin of lib/suppliers/types.ts.
+// The flight supplier abstraction, the air-side twin of lib/suppliers/types.ts.
 // Every flight source (Duffel, Amadeus, a consolidator) implements this one
 // interface so the flight rate-shop never knows which supplier it is talking to.
 //
 // One important asymmetry vs hotels: on flights, CONTENT is easy and FULFILMENT
 // is the gate. Without IATA accreditation you cannot plate a ticket, so a
 // supplier that can only search is worth something (price benchmark) but cannot
-// close a booking. `bookable` on the status carries that distinction — the UI
+// close a booking. `bookable` on the status carries that distinction, the UI
 // must never offer a Book button on a supplier that can't issue.
 
 export interface FlightQuery {
@@ -17,7 +17,7 @@ export interface FlightQuery {
   children?: number;
   cabin: CabinClass;
   maxConnections?: number;
-  currency?: string; // advisory only — most air suppliers price in their own currency
+  currency?: string; // advisory only, most air suppliers price in their own currency
 }
 
 export type CabinClass = "economy" | "premium_economy" | "business" | "first";
@@ -25,7 +25,7 @@ export type CabinClass = "economy" | "premium_economy" | "business" | "first";
 export interface FlightSegment {
   carrier: string; // marketing carrier IATA, e.g. EK
   carrierName: string;
-  flightNumber: string; // "512" — number only, carrier is separate
+  flightNumber: string; // "512", number only, carrier is separate
   origin: string;
   destination: string;
   departAt: string; // ISO 8601
@@ -57,7 +57,7 @@ export interface NormalizedFlightOffer {
   slices: FlightSlice[];
   net: number; // what we pay the supplier, in `currency`
   currency: string;
-  checkedBags: number; // MIN pieces across all segments — the honest number
+  checkedBags: number; // MIN pieces across all segments, the honest number
   refundable?: boolean;
   changeable?: boolean;
   expiresAt?: string; // air offers go stale in minutes, not hours
@@ -101,7 +101,7 @@ export interface FlightSupplierAdapter {
   priceCheck(offerId: string): Promise<{ net: number; currency: string; expired: boolean }>;
   // Optional by design: a supplier with no ticketing authority (Amadeus
   // Self-Service) simply does not implement these, so it is impossible to route
-  // a booking to a supplier that cannot issue — the type system enforces the
+  // a booking to a supplier that cannot issue, the type system enforces the
   // rule instead of a runtime check we might forget.
   passengerSlots?(offerId: string): Promise<{ id: string; type: string }[]>;
   book?(params: { offerId: string; passengers: PassengerInput[] }): Promise<BookingResult>;
@@ -109,8 +109,8 @@ export interface FlightSupplierAdapter {
   offer?(offerId: string): Promise<NormalizedFlightOffer | null>;
 }
 
-// Cross-supplier flight identity. Unlike hotels — where LiteAPI's hotelId means
-// nothing to TBO and matching is genuinely hard — a flight has a natural global
+// Cross-supplier flight identity. Unlike hotels, where LiteAPI's hotelId means
+// nothing to TBO and matching is genuinely hard, a flight has a natural global
 // key: carrier + flight number + departure date, per segment. Two suppliers
 // quoting "EK 512 on 2026-08-19" are quoting the same seat, so "cheapest of N"
 // on flights is exact where on hotels it is approximate.

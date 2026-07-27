@@ -10,19 +10,19 @@ import {
   type NormalizedFlightOffer,
 } from "./types";
 
-// Amadeus Self-Service — SHOP-ONLY, and as of 17 July 2026, CLOSED.
+// Amadeus Self-Service, SHOP-ONLY, and as of 17 July 2026, CLOSED.
 //
 // Amadeus decommissioned the self-service developer portal on 2026-07-17:
 // new registration is shut and existing keys are disabled. Only the Enterprise
-// portal survives, and that needs a contract and an account manager — not a
+// portal survives, and that needs a contract and an account manager, not a
 // self-serve key. So this adapter is kept for one reason: anyone holding a
 // still-valid legacy key can keep shopping with it, and the code is already in
 // place if we ever land an Enterprise contract.
 //
 // Do not plan on getting a new key here. Duffel is the self-serve path now.
 //
-// It was never able to issue a ticket in any case — Self-Service has no
-// ticketing authority — so `bookable` is false and it implements no book().
+// It was never able to issue a ticket in any case, Self-Service has no
+// ticketing authority, so `bookable` is false and it implements no book().
 //
 // Auth is OAuth2 client-credentials; the token lives ~30 min so we cache it.
 
@@ -53,8 +53,8 @@ function status(): FlightSupplierStatus {
     live: connected,
     bookable: false, // structural: Self-Service has no ticketing authority
     note: connected
-      ? `Legacy key in use (${creds().host.startsWith("test") ? "test" : "production"}) — SHOP ONLY, cannot issue tickets. Portal closed 17 Jul 2026; this key will stop working.`
-      : "CLOSED — Amadeus decommissioned the self-service portal on 17 Jul 2026. No new keys. Use Duffel, or an Amadeus Enterprise contract.",
+      ? `Legacy key in use (${creds().host.startsWith("test") ? "test" : "production"}). SHOP ONLY, cannot issue tickets. Portal closed 17 Jul 2026; this key will stop working.`
+      : "CLOSED. Amadeus decommissioned the self-service portal on 17 Jul 2026. No new keys. Use Duffel, or an Amadeus Enterprise contract.",
   };
 }
 
@@ -202,7 +202,7 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
 async function priceCheck(): Promise<{ net: number; currency: string; expired: boolean }> {
   // Deliberately unsupported: Amadeus Self-Service offers are not held and we
   // cannot issue against them. Anything that reaches here is a routing bug.
-  throw new Error("Amadeus Self-Service is shop-only — route booking to a supplier that can issue");
+  throw new Error("Amadeus Self-Service is shop-only. Route booking to a supplier that can issue");
 }
 
 export const amadeusAdapter: FlightSupplierAdapter = { code: CODE, name: NAME, status, search, priceCheck };

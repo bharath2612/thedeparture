@@ -22,7 +22,7 @@ function status(): SupplierStatus {
     connected: enabled(),
     live: enabled(),
     note: enabled()
-      ? "SYNTHETIC test supplier — fake rates, for demonstrating the cheapest-picker only."
+      ? "SYNTHETIC test supplier. Fake rates, for demonstrating the cheapest-picker only."
       : "Off. Set ENABLE_DEMO_SUPPLIER=true to visualise multi-supplier shopping.",
   };
 }

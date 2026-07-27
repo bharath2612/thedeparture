@@ -12,8 +12,8 @@ import {
 // SYNTHETIC AIR SUPPLIERS. Not real. The air twin of lib/suppliers/demo-adapter.ts.
 //
 // Enabled only with ENABLE_DEMO_AIR=true, so you can watch the flight
-// rate-shop — fan-out, exact itinerary matching, cheapest-of-N, the checked-bag
-// filter — before a real air token exists. Two instances are registered with
+// rate-shop, fan-out, exact itinerary matching, cheapest-of-N, the checked-bag
+// filter, before a real air token exists. Two instances are registered with
 // different price biases precisely so the picker has something to pick.
 //
 // Every price and schedule here is INVENTED. Both instances report
@@ -46,7 +46,7 @@ function enabled(): boolean {
   return process.env.ENABLE_DEMO_AIR === "true";
 }
 
-// Deterministic hash so the same query returns the same fares on every reload —
+// Deterministic hash so the same query returns the same fares on every reload ,
 // prices that jitter on refresh make the picker impossible to reason about.
 function hash(seed: string): number {
   let h = 0;
@@ -103,7 +103,7 @@ export function makeDemoAirAdapter(opts: {
       live: enabled(),
       bookable: false, // synthetic: never issue, never pretend to
       note: enabled()
-        ? "SYNTHETIC — invented fares and schedules, for demonstrating the air rate-shop only. Cannot be booked."
+        ? "SYNTHETIC. Invented fares and schedules, for demonstrating the air rate-shop only. Cannot be booked."
         : "Off. Set ENABLE_DEMO_AIR=true to visualise multi-supplier flight shopping before a real token exists.",
     };
   }
@@ -152,7 +152,7 @@ export function makeDemoAirAdapter(opts: {
     throw new Error(`${opts.name} is synthetic and cannot be priced for booking.`);
   }
 
-  // Deliberately no book() / passengerSlots() — a supplier that cannot issue
+  // Deliberately no book() / passengerSlots(), a supplier that cannot issue
   // must not even have the method.
   return { code: opts.code, name: opts.name, status, search, priceCheck };
 }

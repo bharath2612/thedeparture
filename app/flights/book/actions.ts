@@ -20,7 +20,7 @@ export async function bookFlightAction(_prev: BookState, form: FormData): Promis
   if (!supplier) return { error: "Unknown supplier." };
   if (!supplier.book) {
     return {
-      error: `${supplier.name} has no ticketing authority — this fare can be shopped but not issued.`,
+      error: `${supplier.name} has no ticketing authority, so this fare can be shopped but not issued.`,
     };
   }
 
@@ -45,7 +45,7 @@ export async function bookFlightAction(_prev: BookState, form: FormData): Promis
   }
 
   if (!passengers[0].email || !passengers[0].phone) {
-    return { error: "Contact email and phone are required — that's how your agent reaches you." };
+    return { error: "Contact email and phone are required. That is how your agent reaches you." };
   }
   if (!/^\+[1-9]\d{6,14}$/.test(passengers[0].phone)) {
     return { error: "Phone must be in international format, e.g. +919876543210." };
@@ -65,7 +65,7 @@ export async function bookFlightAction(_prev: BookState, form: FormData): Promis
     return { error: String((e as Error).message || e) };
   }
 
-  // redirect() throws by design — it must sit outside the try/catch above or it
+  // redirect() throws by design, it must sit outside the try/catch above or it
   // would be swallowed and reported as a booking failure.
   const q = new URLSearchParams({
     ref,

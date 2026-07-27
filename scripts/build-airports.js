@@ -1,5 +1,5 @@
 // Build a compact worldwide airport index from OurAirports open data
-// (public domain). Output ships in the repo — no key, no runtime dependency.
+// (public domain). Output ships in the repo, no key, no runtime dependency.
 const fs = require("fs");
 
 function parseCsv(text) {

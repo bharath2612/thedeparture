@@ -164,7 +164,7 @@ export default async function HotelDetail({
                   <input type="hidden" name="checkout" value={checkout} />
                   <input type="hidden" name="nights" value={String(nights)} />
                   <button className="bookbtn" type="submit" disabled={isDemo}>
-                    {isDemo ? "synthetic — not bookable" : "Lock price & quote →"}
+                    {isDemo ? "synthetic, not bookable" : "Lock price & quote →"}
                   </button>
                 </form>
               </div>

@@ -96,7 +96,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
         </div>
 
         {/* How many suppliers we checked is a selling point. WHICH suppliers,
-            and which of them can ticket, is our supply chain — ops only. */}
+            and which of them can ticket, is our supply chain, ops only. */}
         <div className="shopbar">
           <span>
             <b>Air rate-shop:</b> {liveCount} of {res.suppliers.length} supplier
@@ -135,7 +135,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
           (ops ? (
             <div className="callout">
               <b>No air supplier connected.</b> Set <code>DUFFEL_TOKEN</code> (self-serve signup, no
-              IATA needed — it issues on its own accreditation) and this page goes live immediately.
+              IATA needed, it issues on its own accreditation) and this page goes live immediately.
               Amadeus Self-Service can be added alongside for a second price, but it cannot issue
               tickets.
             </div>
@@ -143,7 +143,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
             <div className="callout">
               <b>Flight search is not open yet.</b> We&apos;re finishing our airline ticketing
               connection. Hotels are live now, and an agent can quote a flight for you in the
-              meantime — <Link href="/results">search stays →</Link>
+              meantime. <Link href="/results">Search stays →</Link>
             </div>
           ))}
 
@@ -201,7 +201,7 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
                         {!f.comparable && (
                           <span style={{ color: "var(--alert)" }}>
                             {" "}
-                            · quotes in different currencies — not directly comparable
+                            · quotes in different currencies, not directly comparable
                           </span>
                         )}
                       </span>
@@ -256,13 +256,13 @@ export default async function Flights({ searchParams }: { searchParams: Promise<
 
         {ops && bookableCount === 0 && liveCount > 0 && (
           <div className="callout">
-            Every connected air supplier is <b>shop-only</b> — these are real prices but nothing here can
+            Every connected air supplier is <b>shop-only</b>. These are real prices but nothing here can
             be ticketed. Add Duffel (or a consolidator) to close the loop.
           </div>
         )}
 
         <div className="footer">
-          Flight identity is exact — carrier + flight number + date — so &ldquo;cheapest of N&rdquo; on
+          Flight identity is exact (carrier, flight number and date), so &ldquo;cheapest of N&rdquo; on
           air is a true comparison, not a fuzzy match. Ranking is on price; the checked-bag filter is a
           filter, never an invented bag fee.
         </div>

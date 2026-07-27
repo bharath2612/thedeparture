@@ -50,7 +50,7 @@ export default function PlacePicker({
 
   useEffect(() => setMounted(true), []);
 
-  // Close when the click lands outside BOTH the field and the portalled list —
+  // Close when the click lands outside BOTH the field and the portalled list ,
   // the list is not a DOM descendant of the field, so one check isn't enough.
   useEffect(() => {
     function onDocDown(e: MouseEvent) {

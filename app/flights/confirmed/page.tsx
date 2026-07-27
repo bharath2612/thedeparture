@@ -11,7 +11,7 @@ export default async function Confirmed({
   searchParams: Promise<{ ref?: string; order?: string; net?: string; currency?: string; supplier?: string }>;
 }) {
   const sp = await searchParams;
-  const ref = sp.ref || "—";
+  const ref = sp.ref || "not issued";
   const currency = sp.currency || "USD";
   const net = Number(sp.net) || 0;
   const p = priceUp(net, currency);
@@ -22,14 +22,14 @@ export default async function Confirmed({
         <div className="detail-top">
           <div className="name">Ticketed.</div>
           <div className="sub">
-            Issued via {sp.supplier || "supplier"} · order {sp.order || "—"}
+            Issued via {sp.supplier || "supplier"} · order {sp.order || "not issued"}
           </div>
         </div>
 
         <div className="ticket">
           <div className="ticket-top">
             <div className="route">PNR {ref}</div>
-            <div className="sub">Airline booking reference — quote this at check-in.</div>
+            <div className="sub">Airline booking reference. Quote this at check-in.</div>
           </div>
           <div className="ticket-body">
             <div className="tline">
@@ -59,7 +59,7 @@ export default async function Confirmed({
           <div className="left" style={{ padding: 28, gap: 16 }}>
             <AgentChip name="Priya Nair" />
             <p style={{ fontSize: 14.5, color: "var(--ink-2)", lineHeight: 1.6 }}>
-              Your agent is attached to this booking. If the flight moves, we already know — rebook
+              Your agent is attached to this booking. If the flight moves, we already know, and rebook
               options are held before you notice.
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

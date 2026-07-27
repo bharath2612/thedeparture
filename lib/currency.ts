@@ -1,4 +1,4 @@
-// Currency selection — the shared, environment-free half.
+// Currency selection, the shared, environment-free half.
 //
 // This file is imported by the client switcher, so it must NOT pull in
 // next/headers. Server-side resolution lives in lib/currency.server.ts.
@@ -10,7 +10,7 @@
 // offer is displayed in its own currency and labelled as such.
 //
 // Applying our own FX rate would mean inventing a number, then charging a
-// traveller against it — the rate would be stale by the time they paid, and any
+// traveller against it, the rate would be stale by the time they paid, and any
 // gap comes out of the margin. If we want a single display currency across all
 // suppliers, that needs a real FX source with a timestamp shown, and a decision
 // about who wears the spread. That's a business call, not a formatting one.

@@ -25,7 +25,7 @@ const STEPS = [
   {
     num: "1",
     title: "We find the best price",
-    body: "We fan out to every connected supplier at once and show you the lowest net we can find — so you always save real money.",
+    body: "We fan out to every connected supplier at once and show you the lowest net we can find, so you always save real money.",
     img: "/img/step-1.webp",
   },
   {
@@ -43,10 +43,10 @@ const STEPS = [
 ];
 
 // The band headline is a function of the tab: someone on Hotels should not be
-// sold a flight promise. Same claim underneath both — cheapest net, real agent
-// — said in the language of what they're actually shopping for. The badge is
-// deliberately identical across tabs: it's the brand line, not a mode line, so
-// it must not flicker when the tab changes.
+// sold a flight promise. The same claim underneath both (cheapest net, real
+// agent), said in the language of what they are actually shopping for. The
+// badge is deliberately identical across tabs: it is the brand line, not a
+// mode line, so it must not flicker when the tab changes.
 const BADGE = "Smart travel · AI powered · We are with you on every trip";
 
 const BAND_COPY = {
@@ -57,7 +57,7 @@ const BAND_COPY = {
         Book smarter. <span className="grad">Land cheaper.</span>
       </>
     ),
-    sub: "One search across every supplier we're connected to — and a named agent on the trip, not a ticket queue.",
+    sub: "One search across every supplier we're connected to, plus a named agent on the trip rather than a ticket queue.",
   },
   hotels: {
     badge: BADGE,
@@ -66,7 +66,7 @@ const BAND_COPY = {
         Check in for less. <span className="grad">Stay a night longer.</span>
       </>
     ),
-    sub: "We price the same room across every connected supplier and sell you the cheapest — with the same agent on the booking if anything moves.",
+    sub: "We price the same room across every connected supplier and sell you the cheapest, with the same agent on the booking if anything moves.",
   },
 } as const;
 
@@ -74,17 +74,17 @@ const PILLARS = [
   {
     num: "01",
     title: "An agent there to assist you",
-    body: "Our agent is on every booking — a real person, one tap away on WhatsApp. No policy menus, no ticket purgatory, no bots.",
+    body: "Our agent is on every booking: a real person, one tap away on WhatsApp. No policy menus, no ticket purgatory, no bots.",
   },
   {
     num: "02",
     title: "A real SLA, in writing",
-    body: "We respond in under five minutes and show the countdown live. Service isn't buried in the footer — it's on every screen.",
+    body: "We respond in under five minutes and show the countdown live. Service isn't buried in the footer. It's on every screen.",
   },
   {
     num: "03",
     title: "The floor, every time",
-    body: "We fan out to suppliers in parallel, pick the cheapest net, and prove it. Same price as any OTA — the human is the upgrade.",
+    body: "We fan out to suppliers in parallel, pick the cheapest net, and prove it. Same price as any OTA. The human is the upgrade.",
   },
 ];
 
@@ -97,14 +97,14 @@ export default async function Home() {
   const totalLive = liveAir.length + liveHotel.length;
 
   const supplierLine = totalLive
-    ? `We query ${totalLive} connected supplier${totalLive > 1 ? "s" : ""} in parallel and sell the cheapest net — every time.`
-    : "No suppliers connected yet — add a key to go live.";
+    ? `We query ${totalLive} connected supplier${totalLive > 1 ? "s" : ""} in parallel and sell the cheapest net, every time.`
+    : "No suppliers connected yet. Add a key to go live.";
 
   return (
     <>
       {/* Search first. The traveller who arrives ready to book should not have
           to scroll past a manifesto to type a city. The brand statement still
-          exists — it moved below, where it reads as a reason to trust us rather
+          exists, it moved below, where it reads as a reason to trust us rather
           than an obstacle between the header and the search field. */}
       <section className="searchband">
         <div className="inner">
@@ -116,7 +116,7 @@ export default async function Home() {
               checkout: isoDaysOut(33),
             }}
             flightsLive={flightsLive}
-            // The adapter's status note is a developer diagnostic — it names the
+            // The adapter's status note is a developer diagnostic, it names the
             // env var to set, and it reached the customer as the tab's title
             // attribute. Gated like everything else operational.
             flightsNote={
@@ -151,12 +151,12 @@ export default async function Home() {
           <div className="hero-copy">
             <h2 className="herohead">
               The booking platform that helps you book{" "}
-              <span className="grad">smarter &amp; cheaper</span> — and has your back{" "}
+              <span className="grad">smarter &amp; cheaper</span>, and has your back{" "}
               <span className="grad-2">24/7.</span>
             </h2>
             <p className="standfirst">
               Book with us and save real money on your flights and hotels. And if anything goes wrong,
-              our agents are here to help — round the clock. No stress.
+              our agents are here to help, round the clock. No stress.
             </p>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default async function Home() {
             <p style={{ fontSize: 15, lineHeight: 1.65, color: "var(--ink-2)", maxWidth: 440 }}>
               A delay isn&apos;t a scary red error and a &ldquo;contact support&rdquo; dead-end. It&apos;s
               a status update with an agent already assigned, rebook options held, and a WhatsApp thread
-              open — before you even notice.
+              open before you even notice.
             </p>
             {showOpsPricing() ? (
               <Link className="btn btn-white" href="/suppliers">
@@ -270,8 +270,8 @@ export default async function Home() {
               Book for your circle. <span className="grad-3">Earn when they fly.</span>
             </h2>
             <p style={{ fontSize: 16, color: "rgba(245,247,250,0.8)", lineHeight: 1.6 }}>
-              Every trip you book for family and friends earns you a share — and we&apos;ve got them if
-              anything goes wrong. That&apos;s the affiliate graph OTAs can&apos;t copy.
+              Every trip you book for family and friends earns you a share, and we&apos;ve got them if
+              anything goes wrong.
             </p>
             <div style={{ display: "flex", gap: 14, marginTop: 4, flexWrap: "wrap", justifyContent: "center" }}>
               <Link className="btn btn-white" href="/flights">
@@ -458,7 +458,7 @@ async function HotelShowcase({ currency }: { currency: string }) {
 
       {data.hotels.length === 0 ? (
         <div className="callout" style={{ marginTop: 0 }}>
-          <b>No live rates right now.</b> {data.error || "Try a search — sandbox inventory varies by city and date."}
+          <b>No live rates right now.</b> {data.error || "Try a search. Sandbox inventory varies by city and date."}
         </div>
       ) : (
         <div className="hcardgrid">
@@ -482,14 +482,14 @@ async function HotelShowcase({ currency }: { currency: string }) {
                   <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                     <span className="hname">{h.name}</span>
                     <span className="hsub">
-                      {h.stars ? "★".repeat(Math.min(5, h.stars)) : "—"} · {h.city || data.city}
+                      {h.stars ? "★".repeat(Math.min(5, h.stars)) : "Unrated"} · {h.city || data.city}
                     </span>
                   </div>
                   <div className="foot">
                     <span style={{ display: "flex", flexDirection: "column" }}>
                       {/* Per night leads, because that is the number a
                           traveller compares on. The stay total follows it, with
-                          the stay spelled out — a bare total reads as a nightly
+                          the stay spelled out, a bare total reads as a nightly
                           rate and makes a correct price look wrong. */}
                       <span className="amt">{money(p.sell / data.nights, p.currency)}</span>
                       <span className="per">

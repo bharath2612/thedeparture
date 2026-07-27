@@ -1,5 +1,5 @@
-/* thedeparture.ai — design system.
-   Ported from "The Departure — Landing" (see DESIGN.md). Dark, glass, one
+/* thedeparture.ai, design system.
+   Ported from "The Departure, Landing" (see DESIGN.md). Dark, glass, one
    brand promise. The token NAMES are unchanged from the old FIDS language, so
    every page built against them re-skins for free; only the values moved. */
 
@@ -349,7 +349,7 @@ h1 {
   max-width: 580px;
 }
 
-/* The hero is no longer the entry point — it's a brand band further down the
+/* The hero is no longer the entry point, it's a brand band further down the
    page, so it holds only the claim and carries no search bar or destination
    cards. It's shorter, and its copy is vertically centred. The heading is an
    h2 with h1 proportions: the page's one h1 now lives in the search band. */
@@ -358,7 +358,7 @@ h1 {
   justify-content: center;
 }
 /* The hero photograph is a sunset, so its middle band is the brightest part of
-   the frame — exactly where the standfirst sits. The shared scrim thins to 0.35
+   the frame, exactly where the standfirst sits. The shared scrim thins to 0.35
    there, which was fine over the old flat artwork and is not fine over this.
    Lift the floor without flattening the sunset out of existence. */
 .hero-card.brandband .hero-scrim {
@@ -376,7 +376,7 @@ h1 {
 }
 /* Deliberately smaller than the search band's h1 (which tops out at 46px).
    This band is a supporting claim halfway down the page, not the page's
-   headline — when it was the larger of the two it read as the main event and
+   headline, when it was the larger of the two it read as the main event and
    the whole section fell out of proportion. */
 .herohead {
   margin: 0;
@@ -467,7 +467,7 @@ h1 {
   grid-template-columns: 1.5fr 1.4fr 1fr auto;
 }
 /* the passenger + contact grids on /flights/book. Their columns used to be
-   inline styles, which outrank every media query — so the form could not
+   inline styles, which outrank every media query, so the form could not
    collapse at any width. They live here now so they can. */
 .paxgrid {
   padding: 0;
@@ -583,17 +583,17 @@ h1 {
    The bar is one object, not a row of boxes. Booking builds this by making
    the container's background the divider: fields sit on it with a hairline
    gap, so one colour draws every seam and the whole thing wraps correctly at
-   any column count — no stray leading border at the start of a wrapped row.
+   any column count, no stray leading border at the start of a wrapped row.
    We use the same trick with the rule colour rather than an accent: a blue
    ring on a navy band is blue-on-blue, where Booking's yellow-on-blue is a
    deliberate high-contrast frame. The only colour in the bar is the Search
    button, which is the one thing that should pull the eye.
 
-   Fields are solid rather than glass — the band is flat, so there is nothing
+   Fields are solid rather than glass, the band is flat, so there is nothing
    to see through, and solid wins on input legibility. */
 /* The glow is centred INSIDE the band rather than above it. Sitting at -30% it
    was brightest along the very top edge, which is the one line that has to
-   match the header exactly — so the band began with a blue lift the header
+   match the header exactly, so the band began with a blue lift the header
    could not have, and the two never met cleanly. */
 .searchband {
   position: relative;
@@ -646,7 +646,7 @@ h1 {
 }
 
 /* Glass. The frame colour is a light wash that shows through the 1px gaps as
-   the seams, and the fields are a dark translucent tint on top — so the
+   the seams, and the fields are a dark translucent tint on top, so the
    dividers read as light hairlines across a single pane rather than as gaps
    between separate boxes. The blur is on the frame, once; the fields only
    tint, or every cell would blur its neighbours' edges. */
@@ -678,7 +678,7 @@ h1 {
   min-height: 66px;
   transition: background 0.18s ease;
 }
-/* Focus lightens the pane rather than darkening it — the active field should
+/* Focus lightens the pane rather than darkening it, the active field should
    look like the one letting the most light through. */
 .searchbar .field:focus-within {
   background: rgba(255, 255, 255, 0.1);
@@ -848,7 +848,7 @@ h1 {
 /* The secondary line ("United Arab Emirates" under "Dubai"). It hung 17px
    BELOW its own field, which the old floating card had room for. Inside the
    search bar it either gets clipped by the frame's overflow or, once the grid
-   stacks, prints straight across the field underneath — visible as ghost text
+   stacks, prints straight across the field underneath, visible as ghost text
    over CHECK-IN on a phone and over GUESTS on a tablet. It belongs in the
    field's own flow. */
 .searchbar .picker-sub {
@@ -870,7 +870,7 @@ h1 {
 /* Position is computed in JS and applied inline (see useAnchored): these
    panels are portalled to <body> because the search card clips its children
    and its backdrop-filter traps fixed positioning. Do not add top/left/width
-   here — inline styles own placement, CSS owns appearance. */
+   here, inline styles own placement, CSS owns appearance. */
 .picker-list,
 .cal-pop {
   z-index: 200;
@@ -1078,7 +1078,7 @@ h1 {
   display: block;
 }
 /* Loading placeholder. It deliberately shows no photograph rather than a
-   stand-in one — a card that will resolve to Singapore must not flash Dubai
+   stand-in one, a card that will resolve to Singapore must not flash Dubai
    first. */
 .destcard.skel {
   background: linear-gradient(110deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%);
@@ -2377,7 +2377,7 @@ h2.legal-h {
   .searchbar.hotels {
     grid-template-columns: 1fr;
   }
-  /* undo the tablet placement — on a single column those spans would conjure
+  /* undo the tablet placement, on a single column those spans would conjure
      an implicit second column and the bar would go crooked. */
   .searchbar.flights > :nth-child(4),
   .searchbar.flights > :nth-child(5),
@@ -2571,7 +2571,7 @@ h2.legal-h {
 }
 
 /* Touch devices, at any width: 32px is a fine mouse target and a poor thumb
-   one. Sized up rather than hidden — these are real controls. */
+   one. Sized up rather than hidden, these are real controls. */
 @media (pointer: coarse) {
   .stepper button {
     width: 40px;

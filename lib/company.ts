@@ -5,7 +5,7 @@
 // Fields we do not have are left empty, and the pages OMIT the sentence that
 // would have carried them rather than printing a gap. A published policy
 // should never show "[LLPIN to be added]" to a customer, and it should never
-// show an invented one either — so the only honest option is to not make the
+// show an invented one either, so the only honest option is to not make the
 // claim until the number exists. Fill a field in here and the sentence
 // reappears on its own.
 
@@ -48,7 +48,7 @@ export function addressOneLine(): string {
   return addressLines().join(", ");
 }
 
-// "LLPIN 123, GSTIN 456" / "LLPIN 123" / "" — joins only the parts we hold, so
+// "LLPIN 123, GSTIN 456" / "LLPIN 123" / "", joins only the parts we hold, so
 // a missing registration number removes itself from the sentence instead of
 // leaving a dangling label or a stray comma.
 export function registrationLine(): string {

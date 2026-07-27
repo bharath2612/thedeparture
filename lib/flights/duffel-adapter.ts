@@ -33,14 +33,14 @@ function status(): FlightSupplierStatus {
     name: NAME,
     connected,
     live: connected,
-    // Duffel issues on its own airline relationships — the whole reason it is
+    // Duffel issues on its own airline relationships, the whole reason it is
     // the launch rail. No IATA needed on our side.
     bookable: connected,
     note: !connected
-      ? "Not connected — set DUFFEL_TOKEN to go live (self-serve signup, no IATA required)"
+      ? "Not connected. Set DUFFEL_TOKEN to go live (self-serve signup, no IATA required)"
       : live
-        ? "Live (production) — issues real tickets on Duffel's own accreditation"
-        : "Live (test mode) — real API, test airlines, no money moves",
+        ? "Live (production). Issues real tickets on Duffel's own accreditation"
+        : "Live (test mode). Real API, test airlines, no money moves",
   };
 }
 
@@ -148,7 +148,7 @@ async function passengerSlots(offerId: string) {
 async function book(params: { offerId: string; passengers: PassengerInput[] }): Promise<BookingResult> {
   // Re-read the offer immediately before ordering. Two reasons: the passenger
   // ids we must quote back are minted per offer, and the price may have moved
-  // since search — we pay what the offer says NOW, never a remembered number.
+  // since search, we pay what the offer says NOW, never a remembered number.
   const offer = await getOffer(params.offerId);
   if (offer.expires_at && new Date(offer.expires_at).getTime() < Date.now()) {
     throw new Error("This fare expired before booking. Search again for a live price.");

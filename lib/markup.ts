@@ -1,4 +1,4 @@
-// The markup engine — the whole point of the business. LiteAPI hands us a net
+// The markup engine, the whole point of the business. LiteAPI hands us a net
 // rate; we add K Global's margin on top and show ONE price. The net is never
 // revealed to the traveller. Later this becomes per-agent / per-supplier rules
 // pulled from the DB; for now it's a single config-driven percentage.
