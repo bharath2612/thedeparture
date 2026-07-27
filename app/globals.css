@@ -351,6 +351,18 @@ h1 {
   min-height: 400px;
   justify-content: center;
 }
+/* The hero photograph is a sunset, so its middle band is the brightest part of
+   the frame — exactly where the standfirst sits. The shared scrim thins to 0.35
+   there, which was fine over the old flat artwork and is not fine over this.
+   Lift the floor without flattening the sunset out of existence. */
+.hero-card.brandband .hero-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(13, 17, 23, 0.62),
+    rgba(13, 17, 23, 0.58) 45%,
+    rgba(13, 17, 23, 0.88)
+  );
+}
 .hero-card.brandband .hero-copy {
   padding: 64px 24px;
   gap: 20px;
@@ -1034,6 +1046,19 @@ h1 {
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.4);
   background: center/cover no-repeat;
   display: block;
+}
+/* Loading placeholder. It deliberately shows no photograph rather than a
+   stand-in one — a card that will resolve to Singapore must not flash Dubai
+   first. */
+.destcard.skel {
+  background: linear-gradient(110deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%);
+  background-size: 220% 100%;
+  animation: tdp-shimmer 1.4s linear infinite;
+}
+@keyframes tdp-shimmer {
+  to {
+    background-position: -220% 0;
+  }
 }
 .destcard::after {
   content: "";

@@ -25,16 +25,19 @@ const STEPS = [
     num: "1",
     title: "We find the best price",
     body: "We fan out to every connected supplier at once and show you the lowest net we can find — so you always save real money.",
+    img: "/img/step-1.webp",
   },
   {
     num: "2",
     title: "Book in seconds",
     body: "Book for yourself or your whole circle. Saved co-travellers, one tap. A named agent is attached from the start.",
+    img: "/img/step-2.webp",
   },
   {
     num: "3",
     title: "We're on it, always",
     body: "Delay at 2am? We already know. Your agent has rebook options held and a WhatsApp thread open before you notice.",
+    img: "/img/step-3.webp",
   },
 ];
 
@@ -133,7 +136,7 @@ export default async function Home() {
 
       <section className="hero-shell">
         <div className="hero-card brandband">
-          <div className="hero-bg" style={{ backgroundImage: 'url("/hero.png")' }} />
+          <div className="hero-bg" style={{ backgroundImage: 'url("/img/hero.webp")' }} />
           <div className="hero-scrim" />
           <div className="hero-dots" />
 
@@ -161,7 +164,7 @@ export default async function Home() {
         <div className="grid3">
           {STEPS.map((s) => (
             <div className="step" key={s.num}>
-              <div className="shot" style={{ backgroundImage: 'url("/hero.png")' }}>
+              <div className="shot" style={{ backgroundImage: `url("${s.img}")` }}>
                 <span className="num">{s.num}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "0 4px" }}>
@@ -246,7 +249,7 @@ export default async function Home() {
       </section>
 
       <section style={{ padding: "0 24px 96px" }}>
-        <div className="cta-card" style={{ backgroundImage: 'url("/hero.png")' }}>
+        <div className="cta-card" style={{ backgroundImage: 'url("/img/cta.webp")' }}>
           <div className="scrim" />
           <div className="inner">
             <h2>
@@ -285,7 +288,7 @@ async function DestinationCards({ currency }: { currency: string }) {
           key={d.code}
           className="destcard"
           href={`/flights?from=${d.from}&to=${d.code}&depart=${isoDaysOut(28)}&adults=1&cabin=economy`}
-          style={{ backgroundImage: 'url("/hero.png")', animation: `tdp-float ${d.dur} ease-in-out infinite` }}
+          style={{ backgroundImage: `url("${d.image}")`, animation: `tdp-float ${d.dur} ease-in-out infinite` }}
         >
           <span className="code">{d.code}</span>
           <span className="label">
@@ -304,7 +307,7 @@ function DestSkeleton() {
   return (
     <div className="destgrid">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="destcard" style={{ backgroundImage: 'url("/hero.png")', opacity: 0.5 }} />
+        <div key={i} className="destcard skel" />
       ))}
     </div>
   );

@@ -140,12 +140,17 @@ export interface DestinationCard {
   from: string; // origin IATA
   price: { sell: number; currency: string } | null;
   dur: string; // float animation duration, straight from the design
+  image: string;
 }
 
+// The photograph belongs with the destination, not with the page: a card that
+// shows a real price for Singapore should show Singapore. Adding a fourth
+// destination without adding its image is the mistake to avoid — the type makes
+// `image` required so that can't compile.
 const DESTINATIONS = [
-  { city: "Dubai", code: "DXB", dur: "6s" },
-  { city: "Singapore", code: "SIN", dur: "7.5s" },
-  { city: "London", code: "LHR", dur: "6.8s" },
+  { city: "Dubai", code: "DXB", dur: "6s", image: "/img/dest-DXB.webp" },
+  { city: "Singapore", code: "SIN", dur: "7.5s", image: "/img/dest-SIN.webp" },
+  { city: "London", code: "LHR", dur: "6.8s", image: "/img/dest-LHR.webp" },
 ];
 
 export async function destinationCards(currency: string, origin = "DEL"): Promise<DestinationCard[]> {
