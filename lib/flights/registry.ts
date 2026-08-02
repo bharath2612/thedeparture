@@ -2,6 +2,7 @@ import "server-only";
 import type { FlightSupplierAdapter } from "./types";
 import { duffelAdapter } from "./duffel-adapter";
 import { amadeusAdapter } from "./amadeus-adapter";
+import { travelportAdapter } from "./travelport-adapter";
 import { makeDemoAirAdapter } from "./demo-adapter";
 
 // Every flight source we onboard is registered here. Onboarding one = implement
@@ -15,6 +16,7 @@ import { makeDemoAirAdapter } from "./demo-adapter";
 export const FLIGHT_SUPPLIERS: FlightSupplierAdapter[] = [
   duffelAdapter,
   amadeusAdapter,
+  travelportAdapter,
   makeDemoAirAdapter({ code: "demo-air-a", name: "DEMO-AIR-A (synthetic)", bias: 1.0 }),
   makeDemoAirAdapter({ code: "demo-air-b", name: "DEMO-AIR-B (synthetic)", bias: 0.94 }),
 ];
