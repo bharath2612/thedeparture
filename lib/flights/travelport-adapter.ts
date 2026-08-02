@@ -328,16 +328,29 @@ function shareCode(a: Candidate, b: Candidate): boolean {
   return false;
 }
 
+// INR has no minor unit so these totals are integers today, but a POS priced in
+// a 2-decimal currency would make exact float equality a coin toss. Half a minor
+// unit is far tighter than any real fare difference and far looser than binary
+// representation error.
+function sameTotal(a: number, b: number): boolean {
+  return Math.abs(a - b) < 0.005;
+}
+
 async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
   if (!hasTravelport()) return [];
   const c = creds();
   const token = await accessToken();
 
-  const passengers: { "@type": string; number: number; passengerTypeCode: string; age?: number }[] = [
+  const passengers: { "@type": string; number: number; passengerTypeCode: string }[] = [
     { "@type": "PassengerCriteria", number: q.adults, passengerTypeCode: "ADT" },
   ];
   if (q.children) {
-    passengers.push({ "@type": "PassengerCriteria", number: q.children, passengerTypeCode: "CNN", age: 8 });
+    // Deliberately no `age`. Travelport accepts CNN without one and applies the
+    // carrier's own child fare; supplying a made-up age would price the booking
+    // against a traveller who does not exist. FlightQuery carries no per-child
+    // ages, so there is no honest age to send. If ages are ever added to the
+    // query, pass them through rather than reintroducing a default.
+    passengers.push({ "@type": "PassengerCriteria", number: q.children, passengerTypeCode: "CNN" });
   }
 
   const legs = [
@@ -358,9 +371,10 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
     business: "Business",
     first: "First",
   };
+  const wantCabin = cabinMap[q.cabin] || "Economy";
   const modifiers: Record<string, unknown> = {
     "@type": "SearchModifiersAir",
-    CabinPreference: [{ "@type": "CabinPreference", preferenceType: "Preferred", cabins: [cabinMap[q.cabin] || "Economy"] }],
+    CabinPreference: [{ "@type": "CabinPreference", preferenceType: "Preferred", cabins: [wantCabin] }],
   };
   if (q.maxConnections !== undefined) modifiers.maxNumberOfStops = q.maxConnections;
 
@@ -368,7 +382,13 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
     CatalogProductOfferingsQueryRequest: {
       CatalogProductOfferingsRequest: {
         "@type": "CatalogProductOfferingsRequestAir",
-        maxNumberOfUpsellsToReturn: 4,
+        // Upsells are higher-cabin and higher-brand variants. They are the ONLY
+        // reason a Business fare comes back from an Economy search, and setting
+        // CabinPreference to "Required" does not suppress them. We collapse to
+        // the cheapest fare per itinerary and cabin anyway, so upsells buy us
+        // nothing and cost us wrong-cabin rows; asking for none also cuts the
+        // response roughly threefold, which matters on a small box.
+        maxNumberOfUpsellsToReturn: 0,
         contentSourceList: ["GDS"],
         PassengerCriteria: passengers,
         SearchCriteriaFlight: legs,
@@ -377,20 +397,31 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
     },
   };
 
-  const res = await fetch(`https://${c.host}/${API_VERSION}/air/catalog/search/catalogproductofferings`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "Accept-Version": API_VERSION,
-      "Content-Version": API_VERSION,
-      XAUTH_TRAVELPORT_ACCESSGROUP: c.accessGroup,
-      E2ETrackingID: `thedeparture-${Date.now()}`,
-    },
-    body: JSON.stringify(body),
-    cache: "no-store",
-  });
+  const send = (bearer: string) =>
+    fetch(`https://${c.host}/${API_VERSION}/air/catalog/search/catalogproductofferings`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${bearer}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Accept-Version": API_VERSION,
+        "Content-Version": API_VERSION,
+        XAUTH_TRAVELPORT_ACCESSGROUP: c.accessGroup,
+        E2ETrackingID: `thedeparture-${Date.now()}`,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+
+  let res = await send(token);
+  // Tokens last 24h, so a cached one long outlives most deploys. If it has been
+  // revoked (password rotation, access group change) every search would fail
+  // until the process restarts, so spend one retry on a genuinely fresh token
+  // before giving up.
+  if (res.status === 401 || res.status === 403) {
+    tokenCache = null;
+    res = await send(await accessToken());
+  }
   if (!res.ok) throw new Error(`Travelport search ${res.status}: ${(await res.text()).slice(0, 300)}`);
 
   const j = (await res.json()) as TpResponse;
@@ -432,6 +463,15 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
     }
     if (!slices.length) return null;
 
+    // Belt and braces on the cabin the traveller actually asked for. Upsells are
+    // off, but CabinPreference is a preference even when set to "Required", so a
+    // carrier can still answer an Economy search with a Business fare. If the
+    // offer reports cabins and none of them is the requested one, it is not what
+    // was asked for and we drop it. An offer that reports no cabin at all is
+    // kept: we cannot assert a mismatch we have not been told about.
+    const reported = slices.flatMap((s) => s.segments.map((g) => g.cabin)).filter(Boolean);
+    if (reported.length && !reported.includes(wantCabin)) return null;
+
     const cabin = slices[0].segments[0]?.cabin;
     const owner = slices[0].segments[0];
     const validating = termsForOffer?.ValidatingAirline?.[0]?.ValidatingAirline;
@@ -471,7 +511,7 @@ async function search(q: FlightQuery): Promise<NormalizedFlightOffer[]> {
     const outs = collectCandidates(outboundGroups);
     const ins = collectCandidates(inboundGroups);
     for (const out of outs) {
-      const match = ins.find((i) => i.total === out.total && i.currency === out.currency && shareCode(out, i));
+      const match = ins.find((i) => sameTotal(i.total, out.total) && i.currency === out.currency && shareCode(out, i));
       if (!match) continue;
       const o = assemble([out, match], out.total, out.currency);
       if (o) offers.push(o);
