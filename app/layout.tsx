@@ -59,8 +59,30 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const sandbox = apiKey().startsWith("sand");
   const currency = await resolveCurrency();
   return (
-    <html lang="en">
+    // suppressHydrationWarning because the script below writes data-sky onto
+    // this element before React hydrates. Without it React sees an attribute
+    // the server never rendered and warns on every load.
+    <html lang="en" suppressHydrationWarning>
       <body>
+        {/* Day or night, in the VIEWER's timezone, which only the client knows.
+            Resolving this on the server would hand every visitor Hyderabad's
+            sky, and resolving it in an effect would paint the wrong sky first
+            and swap it after hydration. A blocking script as the first thing in
+            the body runs before the band is parsed, so the correct sky is the
+            only one ever painted.
+
+            No JS means no attribute, and the CSS defaults to night. That is the
+            deliberate choice: night is the darker palette, so a viewer who
+            never gets the attribute still sees a sky that matches the rest of
+            the dark page rather than a bright band stranded on it.
+
+            ?sky=day / ?sky=night forces a mode, for previewing both without
+            waiting twelve hours. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){function s(){try{var f=new URLSearchParams(location.search).get('sky');var h=new Date().getHours();document.documentElement.setAttribute('data-sky',f==='day'||f==='night'?f:(h>=6&&h<18?'day':'night'))}catch(e){}}s();setInterval(s,6e5)})()`,
+          }}
+        />
         <SiteHeader
           env={{ label: live ? "LIVE" : sandbox ? "SANDBOX" : "TEST", live }}
           currency={{ code: currency.code, source: currency.source }}

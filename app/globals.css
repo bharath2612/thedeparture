@@ -40,8 +40,28 @@
   --alert: #e0765a;
 
   /* Shared by the sticky header and the top of the search band so the two
-     meet without a seam. Change it in one place or not at all. */
-  --band-top: #141c27;
+     meet without a seam. Change it in one place or not at all.
+
+     It is now a function of the sky, below: the header sits directly on the
+     band's top edge, so if the sky changes between day and night and this does
+     not, the seam we removed comes back for half of every day. */
+  --band-top: #10161f;
+
+  /* The sky, night. This is the default on purpose: it is what renders when
+     the data-sky script has not run (no JS, or before it fires), and night is
+     the palette that matches the rest of the dark page. A missing attribute
+     should fail to the sky that looks least wrong, not the brighter one. */
+  --sky-2: #141d2e;
+  --sky-3: #1e2942;
+  --sky-4: #2a2c45;
+  --sky-5: #3b3050;
+  --sky-glow-a: rgba(150, 110, 86, 0.42);
+  --sky-glow-b: rgba(170, 124, 92, 0.2);
+  --cloud-far: 0.26;
+  --cloud-mid: 0.34;
+  --cloud-near: 0.28;
+  --cloud-filter: brightness(0.78) saturate(0.7);
+  --bandsub: var(--ink-2);
 
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   --sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -49,6 +69,26 @@
   --r: 18px;
   --r-sm: 13px;
   --blur: blur(18px);
+}
+
+/* Day. Brighter and bluer, but deliberately NOT a full daylight sky: the band
+   sits in a dark page and the copy on it is --ink and --ink-2, so a sky light
+   enough to be literally accurate is a sky the subhead cannot be read against.
+   The lightest stops are kept low, below the bar, where no text sits, and the
+   subhead is lifted to compensate. */
+[data-sky="day"] {
+  --band-top: #1a2a42;
+  --sky-2: #22405f;
+  --sky-3: #38618c;
+  --sky-4: #5b86ad;
+  --sky-5: #86aac9;
+  --sky-glow-a: rgba(255, 226, 190, 0.5);
+  --sky-glow-b: rgba(255, 236, 214, 0.28);
+  --cloud-far: 0.5;
+  --cloud-mid: 0.6;
+  --cloud-near: 0.48;
+  --cloud-filter: brightness(1.3) saturate(0.95);
+  --bandsub: #dbe6f2;
 }
 
 * {
@@ -591,18 +631,150 @@ h1 {
 
    Fields are solid rather than glass, the band is flat, so there is nothing
    to see through, and solid wins on input legibility. */
-/* The glow is centred INSIDE the band rather than above it. Sitting at -30% it
-   was brightest along the very top edge, which is the one line that has to
-   match the header exactly, so the band began with a blue lift the header
-   could not have, and the two never met cleanly. */
+/* The band is a dusk sky the bar floats in, not a flat panel.
+   The base gradient below is still what the sky fades INTO, so it has to end
+   on --paper exactly: every layer above is masked away before the bottom edge,
+   and whatever is left showing there must match the page or the seam we spent
+   the header comment removing comes straight back.
+
+   overflow:hidden is load-bearing, not tidiness. The cloud planes are 200% wide
+   so they can loop, and without the clip they widen the document and the whole
+   page scrolls sideways on mobile.
+
+   isolation:isolate is also load-bearing. The rays and the horizon glow use
+   mix-blend-mode; without a stacking context of their own they blend against
+   the page background instead of against the sky, which on --paper turns them
+   into flat grey rectangles. */
 .searchband {
   position: relative;
-  padding: 46px 24px 44px;
-  background: radial-gradient(ellipse 92% 88% at 50% 60%, rgba(110, 168, 255, 0.16), transparent 70%),
-    linear-gradient(180deg, var(--band-top), var(--paper));
-  border-bottom: 1px solid var(--rule);
+  isolation: isolate;
+  overflow: hidden;
+  /* Taller than the copy needs. A sky in a 440px band is a gradient; the drift
+     and the parallax only read once there is vertical room above the bar for
+     the clouds to cross. */
+  padding: 76px 24px 96px;
+  background: linear-gradient(180deg, var(--band-top), var(--paper));
 }
+
+/* One mask on the wrapper, so every layer inside dissolves on the same curve.
+   Masking each layer separately drifts: the clouds would still be visible a few
+   pixels after the ramp had gone and you would see them end.
+
+   It has to reach zero WELL before the bottom edge. Soar can fade at 100%
+   because their sky covers the viewport and nothing follows it; ours butts
+   straight onto the next section, so any sky still lit at the last row is a
+   visible step. There is no border-bottom for the same reason: the dissolve is
+   the join, and a rule drawn across it just reinstates the seam. */
+.searchband .sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 56%, rgba(0, 0, 0, 0.4) 80%, transparent 96%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 56%, rgba(0, 0, 0, 0.4) 80%, transparent 96%);
+}
+.searchband .sky > * {
+  position: absolute;
+  inset: 0;
+}
+
+/* Dusk, top to horizon. The top stop is --band-top so the sticky header is the
+   same colour as the sky directly under it and reads as part of it. */
+.sky-ramp {
+  background: linear-gradient(
+    180deg,
+    var(--band-top) 0%,
+    var(--sky-2) 34%,
+    var(--sky-3) 62%,
+    var(--sky-4) 82%,
+    var(--sky-5) 94%
+  );
+}
+
+/* The warm low sun. Wider than it is tall and sitting just off the bottom, so
+   it lifts the horizon without ever showing a visible edge.
+
+   Kept below the bar deliberately. Peaking behind it washed the field labels
+   and cost the bar its edge against the sky. */
+.sky-glow {
+  background: radial-gradient(ellipse 58% 30% at 50% 116%, var(--sky-glow-a), transparent 70%),
+    radial-gradient(ellipse 120% 44% at 50% 122%, var(--sky-glow-b), transparent 68%);
+  mix-blend-mode: screen;
+}
+
+/* Three cloud planes at different speeds. Each is twice the band's width with
+   a tile half its own width, which is exactly one band-width, so translating
+   by -50% lands the pattern back on itself and the loop has no jump. Change
+   the width and the tile size together or the seam appears. */
+.sky-clouds {
+  left: 0;
+  width: 200%;
+  background-repeat: repeat-x;
+  background-size: 50% 100%;
+  will-change: transform;
+  animation: cloud-drift linear infinite;
+  /* The cloud colour is baked into the turbulence SVG's feColorMatrix and so
+     cannot be a custom property. Brightness does the day/night work instead:
+     the same cloud, lit or unlit. */
+  filter: var(--cloud-filter);
+}
+@keyframes cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Far: fine-grained, faint, slow. Reads as distance. */
+.sky-clouds.far {
+  opacity: var(--cloud-far);
+  animation-duration: 190s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.80 0 0 0 0 0.86 0 0 0 0 0.97 -1.75 0 0 0 0.82'/%3E%3C/filter%3E%3Crect width='900' height='500' filter='url(%23c)'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 40%, transparent 62%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 40%, transparent 62%);
+}
+
+/* Mid: the layer that actually reads as cloud. Lower frequency, so the
+   billows are bigger and fewer. */
+.sky-clouds.mid {
+  opacity: var(--cloud-mid);
+  animation-duration: 118s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0062' numOctaves='5' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.87 0 0 0 0 0.90 0 0 0 0 0.98 -1.95 0 0 0 0.90'/%3E%3C/filter%3E%3Crect width='900' height='500' filter='url(%23c)'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(180deg, transparent 4%, #000 26%, #000 58%, transparent 78%);
+  mask-image: linear-gradient(180deg, transparent 4%, #000 26%, #000 58%, transparent 78%);
+}
+
+/* Near: biggest billows, warm from the low sun, fastest. The parallax between
+   this and .far is the whole illusion. */
+.sky-clouds.near {
+  opacity: var(--cloud-near);
+  animation-duration: 74s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='500'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0038' numOctaves='5' seed='27' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.97 0 0 0 0 0.86 0 0 0 0 0.80 -1.90 0 0 0 0.88'/%3E%3C/filter%3E%3Crect width='900' height='500' filter='url(%23c)'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(180deg, transparent 22%, #000 46%, #000 72%, transparent 92%);
+  mask-image: linear-gradient(180deg, transparent 22%, #000 46%, #000 72%, transparent 92%);
+}
+
+/* No crepuscular rays. Soar's twin conic gradients work on a pale full-viewport
+   sky where each shaft is a couple of percent brighter than its neighbour. On
+   our dark ramp the same layer in screen blend has nothing to blend into, so
+   the shafts keep their hard conic edges and read as streaks rather than light.
+   Removed rather than dimmed: at an opacity low enough to lose the edges there
+   was nothing left to see. The horizon glow carries the light instead. */
+
+/* Grain. Large flat gradients band badly on dark, and a little noise at
+   soft-light is what stops the ramp stepping. */
+.sky-grain {
+  opacity: 0.32;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
 .searchband > .inner {
+  position: relative;
+  z-index: 1;
   max-width: var(--maxw);
   margin: 0 auto;
   display: flex;
@@ -624,7 +796,9 @@ h1 {
 .bandcopy .sub {
   font-size: 16.5px;
   line-height: 1.6;
-  color: var(--ink-2);
+  /* --ink-2 at night, lifted in day mode. --ink-2 is tuned for --paper; on the
+     day sky it lands at roughly 1.6:1 and stops being text. */
+  color: var(--bandsub, var(--ink-2));
   max-width: 620px;
 }
 

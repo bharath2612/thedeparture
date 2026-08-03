@@ -100,6 +100,18 @@ export default async function Home() {
           exists, it moved below, where it reads as a reason to trust us rather
           than an obstacle between the header and the search field. */}
       <section className="searchband">
+        {/* Dusk sky. Decorative in full: it carries no information the copy
+            does not, so it is hidden from assistive tech entirely rather than
+            described. Layer order is back to front and matters, the grain has
+            to sit above the clouds to smooth them. */}
+        <div className="sky" aria-hidden="true">
+          <div className="sky-ramp" />
+          <div className="sky-glow" />
+          <div className="sky-clouds far" />
+          <div className="sky-clouds mid" />
+          <div className="sky-clouds near" />
+          <div className="sky-grain" />
+        </div>
         <div className="inner">
           <SearchPanel
             defaults={{
